@@ -319,6 +319,7 @@ etl()
                 <div class="button-group">
                     <button class="btn" onclick="demo1()">🚀 Run Demo</button>
                     <button class="btn btn-secondary" onclick="clearDemo1()">🗑️ Clear</button>
+                    <button class="btn btn-warning" onclick="shareDemo('demo1')">🔗 Share</button>
                 </div>
                 
                 <div id="demo1-result" class="result-area">
@@ -355,6 +356,7 @@ etl()
                 <div class="button-group">
                     <button class="btn" onclick="demo2()">📊 Generate Chart</button>
                     <button class="btn btn-secondary" onclick="clearDemo2()">🗑️ Clear</button>
+                    <button class="btn btn-warning" onclick="shareDemo('demo2')">🔗 Share</button>
                 </div>
                 
                 <div id="demo2-result" class="result-area">
@@ -399,6 +401,7 @@ etl({
                 <div class="button-group">
                     <button class="btn" onclick="demo3()">🎯 Complete Pipeline</button>
                     <button class="btn btn-secondary" onclick="clearDemo3()">🗑️ Clear</button>
+                    <button class="btn btn-warning" onclick="shareDemo('demo3')">🔗 Share</button>
                 </div>
                 
                 <div id="demo3-result" class="result-area">
@@ -433,6 +436,7 @@ etl()
                     <button class="btn" onclick="document.getElementById('csv-file').click()">📁 Select CSV</button>
                     <button class="btn btn-success" onclick="demo4()" id="demo4-btn" disabled>⚡ Process CSV</button>
                     <button class="btn btn-secondary" onclick="clearDemo4()">🗑️ Clear</button>
+                    <button class="btn btn-warning" onclick="shareDemo('demo4')">🔗 Share</button>
                 </div>
                 
                 <div id="demo4-result" class="result-area">
@@ -764,6 +768,82 @@ etl()
 
         // Global variables
         let csvData = null;
+
+        // Permalink utility functions
+        async function generatePermalink(repository, branch = 'main', filePath) {
+            try {
+                const repoMatch = repository.match(/github\.com\/([^\/]+\/[^\/]+)/);
+                if (!repoMatch) {
+                    throw new Error('Invalid GitHub repository URL');
+                }
+
+                const repoPath = repoMatch[1];
+                const rawUrl = `https://raw.githubusercontent.com/${repoPath}/${branch}/${filePath}`;
+                const previewUrl = `https://htmlpreview.github.io/?${rawUrl}`;
+                
+                return {
+                    url: rawUrl,
+                    previewUrl: previewUrl,
+                    success: true
+                };
+            } catch (error) {
+                return {
+                    url: '',
+                    previewUrl: '',
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    const success = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    return success;
+                }
+            } catch (error) {
+                console.error('Failed to copy to clipboard:', error);
+                return false;
+            }
+        }
+
+        // Share demo function
+        window.shareDemo = async function(demoName) {
+            const repository = 'https://github.com/Insomniak313/browser-etl';
+            const filePath = `examples/demo.html`;
+            
+            try {
+                const result = await generatePermalink(repository, 'main', filePath);
+                
+                if (result.success) {
+                    const copied = await copyToClipboard(result.previewUrl);
+                    
+                    if (copied) {
+                        alert('🔗 Permalink copié dans le presse-papiers!\n\n' + result.previewUrl);
+                    } else {
+                        prompt('Partagez ce lien:', result.previewUrl);
+                    }
+                } else {
+                    alert(`Erreur lors de la génération du permalink: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Erreur: ${error.message}`);
+            }
+        };
 
         // Demo functions
         window.demo1 = async () => {
