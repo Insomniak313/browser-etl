@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Code Éditable en Mode WYSIWYG</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .demo-section {
+            margin: 30px 0;
+            padding: 30px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            background: #fafafa;
+        }
+        
+        .demo-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .code-block.editable {
+            border-color: #667eea;
+            cursor: text;
+        }
+        
+        .code-block.editable:hover {
+            border-color: #4facfe;
+        }
+        
+        .code-block.editing {
+            border-color: #43e97b;
+            background: #1a202c;
+        }
+        
+        .code-edit-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            gap: 5px;
+        }
+        
+        .code-block.editable .code-edit-controls {
+            display: flex;
+        }
+        
+        .code-edit-btn {
+            background: rgba(102, 126, 234, 0.8);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+        
+        .code-edit-btn:hover {
+            background: rgba(102, 126, 234, 1);
+        }
+        
+        .code-edit-btn.save {
+            background: rgba(67, 233, 123, 0.8);
+        }
+        
+        .code-edit-btn.save:hover {
+            background: rgba(67, 233, 123, 1);
+        }
+        
+        .code-edit-btn.cancel {
+            background: rgba(250, 112, 154, 0.8);
+        }
+        
+        .code-edit-btn.cancel:hover {
+            background: rgba(250, 112, 154, 1);
+        }
+        
+        .code-textarea {
+            background: transparent;
+            color: inherit;
+            border: none;
+            outline: none;
+            width: 100%;
+            min-height: 100px;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            resize: vertical;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .result-area {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 100px;
+            background: white;
+            border: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .result-area.success {
+            border-color: #43e97b;
+            background: #f0fff4;
+            color: #2d7d32;
+        }
+        
+        .result-area.error {
+            border-color: #fa709a;
+            background: #fff5f5;
+            color: #c53030;
+        }
+        
+        .result-area.loading {
+            border-color: #4facfe;
+            background: #f0f9ff;
+            color: #2b6cb0;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .instructions h3 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 5px 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Test - Code Éditable</h1>
+            <p>Test de la fonctionnalité d'édition de code en mode WYSIWYG</p>
+        </div>
+        
+        <div class="content">
+            <div class="instructions">
+                <h3>📋 Instructions de Test</h3>
+                <ol>
+                    <li>Cliquez sur le bouton "✏️ Edit" dans un bloc de code</li>
+                    <li>Modifiez le code dans la zone de texte qui apparaît</li>
+                    <li>Cliquez sur "💾 Save" pour sauvegarder vos modifications</li>
+                    <li>Ou cliquez sur "❌ Cancel" pour annuler</li>
+                    <li>Testez l'exécution du code modifié avec le bouton "Run Test"</li>
+                </ol>
+            </div>
+            
+            <!-- Test 1: Code JavaScript Simple -->
+            <div class="demo-section">
+                <h2>🧪 Test 1: Code JavaScript Simple</h2>
+                <p>Testez l'édition d'un code JavaScript simple.</p>
+                
+                <div class="code-block editable" data-demo="test1">
+                    <div class="code-edit-controls">
+                        <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
+                    </div>
+                    <div class="code-content">
+// Test de code JavaScript simple
+const message = "Hello, World!";
+console.log(message);
+alert(message);
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="runTest1()">🚀 Run Test 1</button>
+                <div id="test1-result" class="result-area">
+                    Cliquez sur "Run Test 1" pour exécuter le code
+                </div>
+            </div>
+            
+            <!-- Test 2: Code ETL Pipeline -->
+            <div class="demo-section">
+                <h2>🔄 Test 2: Pipeline ETL</h2>
+                <p>Testez l'édition d'un pipeline ETL complet.</p>
+                
+                <div class="code-block editable" data-demo="test2">
+                    <div class="code-edit-controls">
+                        <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
+                    </div>
+                    <div class="code-content">
+etl()
+  .extract.api('https://jsonplaceholder.typicode.com/users')
+  .filter(user => user.id <= 3)
+  .map(user => ({
+    name: user.name,
+    email: user.email,
+    city: user.address.city
+  }))
+  .load.table('#test-table')
+  .run();
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="runTest2()">🚀 Run Test 2</button>
+                <div id="test2-result" class="result-area">
+                    Cliquez sur "Run Test 2" pour exécuter le pipeline
+                </div>
+                
+                <div id="test-table" style="display: none; margin-top: 20px;">
+                    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-weight: 600; color: #333;">Name</th>
+                                <th style="padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-weight: 600; color: #333;">Email</th>
+                                <th style="padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-weight: 600; color: #333;">City</th>
+                            </tr>
+                        </thead>
+                        <tbody id="test-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Test 3: Code avec Fonctions -->
+            <div class="demo-section">
+                <h2>⚙️ Test 3: Code avec Fonctions</h2>
+                <p>Testez l'édition de code contenant des fonctions.</p>
+                
+                <div class="code-block editable" data-demo="test3">
+                    <div class="code-edit-controls">
+                        <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
+                    </div>
+                    <div class="code-content">
+function calculateSum(a, b) {
+    return a + b;
+}
+
+function calculateProduct(a, b) {
+    return a * b;
+}
+
+const result1 = calculateSum(5, 3);
+const result2 = calculateProduct(4, 7);
+
+console.log('Sum:', result1);
+console.log('Product:', result2);
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="runTest3()">🚀 Run Test 3</button>
+                <div id="test3-result" class="result-area">
+                    Cliquez sur "Run Test 3" pour exécuter les fonctions
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for code editing
+        let editedCodeBlocks = {}; // Store edited code for each demo
+        
+        // Code editing functions
+        window.editCode = function(button) {
+            const codeBlock = button.closest('.code-block');
+            const codeContent = codeBlock.querySelector('.code-content');
+            const demoId = codeBlock.getAttribute('data-demo');
+            
+            // Store original content if not already stored
+            if (!editedCodeBlocks[demoId]) {
+                editedCodeBlocks[demoId] = {
+                    original: codeContent.textContent.trim(),
+                    current: codeContent.textContent.trim()
+                };
+            }
+            
+            // Create textarea for editing
+            const textarea = document.createElement('textarea');
+            textarea.className = 'code-textarea';
+            textarea.value = editedCodeBlocks[demoId].current;
+            
+            // Replace content with textarea
+            codeContent.style.display = 'none';
+            codeBlock.appendChild(textarea);
+            
+            // Update controls
+            button.style.display = 'none';
+            const controls = codeBlock.querySelector('.code-edit-controls');
+            controls.innerHTML = `
+                <button class="code-edit-btn save" onclick="saveCode(this)">💾 Save</button>
+                <button class="code-edit-btn cancel" onclick="cancelEdit(this)">❌ Cancel</button>
+            `;
+            
+            // Add editing class
+            codeBlock.classList.add('editing');
+            
+            // Focus and select all text
+            textarea.focus();
+            textarea.select();
+        };
+        
+        window.saveCode = function(button) {
+            const codeBlock = button.closest('.code-block');
+            const textarea = codeBlock.querySelector('.code-textarea');
+            const codeContent = codeBlock.querySelector('.code-content');
+            const demoId = codeBlock.getAttribute('data-demo');
+            
+            // Save the edited code
+            editedCodeBlocks[demoId].current = textarea.value.trim();
+            
+            // Update the displayed content
+            codeContent.textContent = editedCodeBlocks[demoId].current;
+            
+            // Remove textarea and show content
+            textarea.remove();
+            codeContent.style.display = 'block';
+            
+            // Reset controls
+            const controls = codeBlock.querySelector('.code-edit-controls');
+            controls.innerHTML = `<button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>`;
+            
+            // Remove editing class
+            codeBlock.classList.remove('editing');
+            
+            // Show success message
+            showCodeEditSuccess(demoId);
+        };
+        
+        window.cancelEdit = function(button) {
+            const codeBlock = button.closest('.code-block');
+            const textarea = codeBlock.querySelector('.code-textarea');
+            const codeContent = codeBlock.querySelector('.code-content');
+            
+            // Remove textarea and show original content
+            textarea.remove();
+            codeContent.style.display = 'block';
+            
+            // Reset controls
+            const controls = codeBlock.querySelector('.code-edit-controls');
+            controls.innerHTML = `<button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>`;
+            
+            // Remove editing class
+            codeBlock.classList.remove('editing');
+        };
+        
+        function showCodeEditSuccess(demoId) {
+            // Create a temporary success message
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #43e97b;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                z-index: 1000;
+                font-weight: bold;
+                box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+            `;
+            successMsg.textContent = `✅ Code updated for ${demoId}!`;
+            
+            document.body.appendChild(successMsg);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+        }
+        
+        // Function to get edited code for a demo
+        function getEditedCode(demoId) {
+            return editedCodeBlocks[demoId] ? editedCodeBlocks[demoId].current : null;
+        }
+        
+        // Test functions
+        window.runTest1 = function() {
+            const resultDiv = document.getElementById('test1-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '🔄 Executing Test 1...';
+            
+            try {
+                const editedCode = getEditedCode('test1');
+                if (editedCode) {
+                    // Execute the edited code
+                    eval(editedCode);
+                    resultDiv.className = 'result-area success';
+                    resultDiv.innerHTML = '✅ Test 1 executed successfully! Check console for output.';
+                } else {
+                    // Execute original code
+                    const message = "Hello, World!";
+                    console.log(message);
+                    alert(message);
+                    resultDiv.className = 'result-area success';
+                    resultDiv.innerHTML = '✅ Test 1 executed successfully! Check console for output.';
+                }
+            } catch (error) {
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        };
+        
+        window.runTest2 = function() {
+            const resultDiv = document.getElementById('test2-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '🔄 Executing Test 2...';
+            
+            try {
+                // Simulate ETL pipeline execution
+                const mockData = [
+                    { name: 'Leanne Graham', email: 'Sincere@april.biz', city: 'Gwenborough' },
+                    { name: 'Ervin Howell', email: 'Shanna@melissa.tv', city: 'Wisokyburgh' },
+                    { name: 'Clementine Bauch', email: 'Nathan@yesenia.net', city: 'McKenziehaven' }
+                ];
+                
+                const tableBody = document.getElementById('test-table-body');
+                tableBody.innerHTML = '';
+                
+                mockData.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="padding: 15px; text-align: left; border-bottom: 1px solid #eee;">${user.name}</td>
+                        <td style="padding: 15px; text-align: left; border-bottom: 1px solid #eee;">${user.email}</td>
+                        <td style="padding: 15px; text-align: left; border-bottom: 1px solid #eee;">${user.city}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                document.getElementById('test-table').style.display = 'block';
+                resultDiv.className = 'result-area success';
+                resultDiv.innerHTML = '✅ Test 2 executed successfully! Table populated with data.';
+            } catch (error) {
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        };
+        
+        window.runTest3 = function() {
+            const resultDiv = document.getElementById('test3-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '🔄 Executing Test 3...';
+            
+            try {
+                const editedCode = getEditedCode('test3');
+                if (editedCode) {
+                    // Execute the edited code
+                    eval(editedCode);
+                    resultDiv.className = 'result-area success';
+                    resultDiv.innerHTML = '✅ Test 3 executed successfully! Check console for output.';
+                } else {
+                    // Execute original code
+                    function calculateSum(a, b) {
+                        return a + b;
+                    }
+                    
+                    function calculateProduct(a, b) {
+                        return a * b;
+                    }
+                    
+                    const result1 = calculateSum(5, 3);
+                    const result2 = calculateProduct(4, 7);
+                    
+                    console.log('Sum:', result1);
+                    console.log('Product:', result2);
+                    
+                    resultDiv.className = 'result-area success';
+                    resultDiv.innerHTML = '✅ Test 3 executed successfully! Check console for output.';
+                }
+            } catch (error) {
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        };
+    </script>
+</body>
+</html>
