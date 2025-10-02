@@ -34,7 +34,7 @@ export class IndexedDBExtractor implements IExtractor {
         const transaction = db.transaction([storeName], 'readonly');
         const store = transaction.objectStore(storeName);
         
-        let objectStore = store;
+        let objectStore: IDBObjectStore | IDBIndex = store;
         if (index) {
           objectStore = store.index(index);
         }

@@ -4,7 +4,6 @@ import {
   ILoader, 
   ETLConfig, 
   ETLStep, 
-  ETLPipeline, 
   ETLResult 
 } from '../types';
 
@@ -117,7 +116,7 @@ export class ETLPipeline {
         try {
           switch (step.type) {
             case 'extract':
-              currentData = await this.executeExtractStep(step, currentData);
+              currentData = await this.executeExtractStep(step);
               break;
             case 'transform':
               currentData = await this.executeTransformStep(step, currentData);
@@ -182,7 +181,7 @@ export class ETLPipeline {
   /**
    * Execute an extract step
    */
-  private async executeExtractStep(step: ETLStep, previousData: any): Promise<any> {
+  private async executeExtractStep(step: ETLStep): Promise<any> {
     const extractor = this.extractors.get(step.name);
     if (!extractor) {
       throw new Error(`Extractor '${step.name}' not found`);

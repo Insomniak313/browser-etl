@@ -104,6 +104,9 @@ export async function createHtmlPermalink(
     // 2. Upload to a GitHub repository
     // 3. Use a different service for temporary hosting
     
+    // Note: htmlContent is not used in this demo implementation
+    console.log('HTML content length:', htmlContent.length);
+    
     const filePath = `examples/${filename}`;
     
     return await generatePermalink({
