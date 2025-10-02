@@ -2,8 +2,6 @@
 
 A lightweight and extensible JavaScript library for executing **Extract → Transform → Load** pipelines directly in the browser, without a backend.
 
-[![🚀 Live Demo](https://img.shields.io/badge/🚀-Live%20Demo-blue?style=for-the-badge&logo=html5&logoColor=white)](https://browser-etl.github.io/demo)
-
 ## 🚀 Installation
 
 ```bash
