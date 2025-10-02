@@ -13,7 +13,7 @@ export interface FileLoaderConfig {
 export class FileLoader implements ILoader {
   readonly name = 'file';
 
-  async load(data: any, config: FileLoaderConfig): Promise<void> {
+  async load(data: any, config: FileLoaderConfig): Promise<void | any> {
     const {
       filename,
       format = 'json',
@@ -33,7 +33,7 @@ export class FileLoader implements ILoader {
       this.downloadFile(content, finalFilename, finalMimeType);
     } else {
       // Store in memory or return the content
-      return content;
+      return Promise.resolve(content);
     }
   }
 

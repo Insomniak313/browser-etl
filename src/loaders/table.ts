@@ -75,7 +75,7 @@ export class TableLoader implements ILoader {
     }
 
     // Prepare data
-    const tableData = this.prepareTableData(data, headers);
+    const tableData = this.prepareTableData(data);
     const tableHeaders = this.extractHeaders(tableData, headers);
 
     // Create header
@@ -105,7 +105,7 @@ export class TableLoader implements ILoader {
 
     // Create body
     const tbody = document.createElement('tbody');
-    this.populateTableBody(tbody, tableData, className);
+    this.populateTableBody(tbody, tableData);
     table.appendChild(tbody);
 
     wrapper.appendChild(table);
@@ -131,7 +131,7 @@ export class TableLoader implements ILoader {
     return config && config.container;
   }
 
-  private prepareTableData(data: any, headers?: string[]): any[] {
+  private prepareTableData(data: any): any[] {
     if (Array.isArray(data)) {
       return data;
     }
@@ -160,7 +160,7 @@ export class TableLoader implements ILoader {
     return ['Value'];
   }
 
-  private populateTableBody(tbody: HTMLElement, data: any[], className: string): void {
+  private populateTableBody(tbody: HTMLElement, data: any[]): void {
     data.forEach((item, index) => {
       const row = document.createElement('tr');
       row.style.cssText = `

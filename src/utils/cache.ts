@@ -93,7 +93,7 @@ export class Cache {
     const now = Date.now();
     let cleanedCount = 0;
 
-    for (const [key, entry] of this.storage.entries()) {
+    for (const [key, entry] of Array.from(this.storage.entries())) {
       if (now - entry.timestamp > entry.ttl) {
         this.storage.delete(key);
         cleanedCount++;
@@ -114,7 +114,7 @@ export class Cache {
     const now = Date.now();
     let expiredCount = 0;
 
-    for (const entry of this.storage.values()) {
+    for (const entry of Array.from(this.storage.values())) {
       if (now - entry.timestamp > entry.ttl) {
         expiredCount++;
       }

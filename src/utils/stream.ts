@@ -5,8 +5,6 @@ import { StreamConfig } from '../types';
  */
 export class StreamProcessor<T> {
   private config: StreamConfig;
-  private buffer: T[] = [];
-  private processing = false;
 
   constructor(config: StreamConfig) {
     this.config = config;
@@ -84,28 +82,28 @@ export class StreamProcessor<T> {
   createReadableStream(data: T[]): ReadableStream<T> {
     let index = 0;
 
+    const pushData = (controller: ReadableStreamDefaultController<T>) => {
+      const endIndex = Math.min(index + this.config.bufferSize, data.length);
+      
+      for (let i = index; i < endIndex; i++) {
+        controller.enqueue(data[i]);
+      }
+      
+      index = endIndex;
+      
+      if (index >= data.length) {
+        controller.close();
+      }
+    };
+
     return new ReadableStream({
       start(controller) {
         // Initial data
-        this.pushData(controller);
+        pushData(controller);
       },
 
       pull(controller) {
-        this.pushData(controller);
-      },
-
-      pushData: (controller: ReadableStreamDefaultController<T>) => {
-        const endIndex = Math.min(index + this.config.bufferSize, data.length);
-        
-        for (let i = index; i < endIndex; i++) {
-          controller.enqueue(data[i]);
-        }
-        
-        index = endIndex;
-        
-        if (index >= data.length) {
-          controller.close();
-        }
+        pushData(controller);
       }
     });
   }
@@ -166,7 +164,7 @@ export class StreamProcessor<T> {
         const readers = streams.map(stream => stream.getReader());
         let completedCount = 0;
         
-        const pump = async (reader: ReadableStreamDefaultReader<T>, index: number) => {
+        const pump = async (reader: ReadableStreamDefaultReader<T>) => {
           try {
             while (true) {
               const { done, value } = await reader.read();
@@ -186,8 +184,8 @@ export class StreamProcessor<T> {
           }
         };
         
-        readers.forEach((reader, index) => {
-          pump(reader, index);
+        readers.forEach((reader) => {
+          pump(reader);
         });
       }
     });

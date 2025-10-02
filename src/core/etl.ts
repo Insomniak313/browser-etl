@@ -20,10 +20,32 @@ import { ETLConfig } from '../types';
  */
 export class ETL {
   private pipeline: ETLPipeline;
+  
+  extract!: {
+    api: (url: string, options?: RequestInit) => ETL;
+    html: (selector: string, url?: string) => ETL;
+    csv: (data: string | File, options?: any) => ETL;
+    localStorage: (key: string) => ETL;
+    indexedDB: (storeName: string, query?: any) => ETL;
+    file: (file: File, type?: string) => ETL;
+  };
+  
+  join!: {
+    api: (url: string, config: any) => ETL;
+    data: (data: any, config: any) => ETL;
+  };
+  
+  load!: {
+    chart: (type: string, config: any) => ETL;
+    table: (container: string | HTMLElement, config?: any) => ETL;
+    file: (filename: string, format?: string) => ETL;
+    api: (url: string, options?: RequestInit) => ETL;
+  };
 
   constructor(config?: ETLConfig) {
     this.pipeline = new ETLPipeline(config);
     this.registerDefaultComponents();
+    this.initializeMethods();
   }
 
   /**
@@ -55,39 +77,84 @@ export class ETL {
   }
 
   /**
-   * Extract from API
+   * Initialize method objects
    */
-  extract = {
-    api: (url: string, options?: RequestInit) => {
-      this.pipeline.extract('api', { url, options });
-      return this;
-    },
-    
-    html: (selector: string, url?: string) => {
-      this.pipeline.extract('html', { selector, url });
-      return this;
-    },
-    
-    csv: (data: string | File, options?: any) => {
-      this.pipeline.extract('csv', { data, options });
-      return this;
-    },
-    
-    localStorage: (key: string) => {
-      this.pipeline.extract('localStorage', { key });
-      return this;
-    },
-    
-    indexedDB: (storeName: string, query?: any) => {
-      this.pipeline.extract('indexedDB', { storeName, query });
-      return this;
-    },
-    
-    file: (file: File, type?: string) => {
-      this.pipeline.extract('file', { file, type });
-      return this;
-    }
-  };
+  private initializeMethods(): void {
+    this.extract = {
+      api: (url: string, options?: RequestInit) => {
+        this.pipeline.extract('api', { url, options });
+        return this;
+      },
+      
+      html: (selector: string, url?: string) => {
+        this.pipeline.extract('html', { selector, url });
+        return this;
+      },
+      
+      csv: (data: string | File, options?: any) => {
+        this.pipeline.extract('csv', { data, options });
+        return this;
+      },
+      
+      localStorage: (key: string) => {
+        this.pipeline.extract('localStorage', { key });
+        return this;
+      },
+      
+      indexedDB: (storeName: string, query?: any) => {
+        this.pipeline.extract('indexedDB', { storeName, query });
+        return this;
+      },
+      
+      file: (file: File, type?: string) => {
+        this.pipeline.extract('file', { file, type });
+        return this;
+      }
+    };
+
+    this.join = {
+      api: (url: string, config: any) => {
+        this.pipeline.transform('join', { 
+          type: 'api', 
+          url, 
+          config 
+        });
+        return this;
+      },
+      
+      data: (data: any, config: any) => {
+        this.pipeline.transform('join', { 
+          type: 'data', 
+          data, 
+          config 
+        });
+        return this;
+      }
+    };
+
+    this.load = {
+      chart: (type: string, config: any) => {
+        this.pipeline.load('chart', { type, config });
+        return this;
+      },
+      
+      table: (container: string | HTMLElement, config?: any) => {
+        this.pipeline.load('table', { container, config });
+        return this;
+      },
+      
+      file: (filename: string, format?: string) => {
+        this.pipeline.load('file', { filename, format });
+        return this;
+      },
+      
+      api: (url: string, options?: RequestInit) => {
+        this.pipeline.load('api', { url, options });
+        return this;
+      }
+    };
+  }
+
 
   /**
    * Transform data
@@ -97,28 +164,6 @@ export class ETL {
     return this;
   };
 
-  /**
-   * Join data with another source
-   */
-  join = {
-    api: (url: string, config: any) => {
-      this.pipeline.transform('join', { 
-        type: 'api', 
-        url, 
-        config 
-      });
-      return this;
-    },
-    
-    data: (data: any, config: any) => {
-      this.pipeline.transform('join', { 
-        type: 'data', 
-        data, 
-        config 
-      });
-      return this;
-    }
-  };
 
   /**
    * Filter data
@@ -144,30 +189,6 @@ export class ETL {
     return this;
   };
 
-  /**
-   * Load data
-   */
-  load = {
-    chart: (type: string, config: any) => {
-      this.pipeline.load('chart', { type, config });
-      return this;
-    },
-    
-    table: (container: string | HTMLElement, config?: any) => {
-      this.pipeline.load('table', { container, config });
-      return this;
-    },
-    
-    file: (filename: string, format?: string) => {
-      this.pipeline.load('file', { filename, format });
-      return this;
-    },
-    
-    api: (url: string, options?: RequestInit) => {
-      this.pipeline.load('api', { url, options });
-      return this;
-    }
-  };
 
   /**
    * Run the pipeline

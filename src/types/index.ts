@@ -48,7 +48,7 @@ export interface ILoader<T = any> {
    * @param config Configuration for the loading
    * @returns Promise resolving when loading is complete
    */
-  load(data: T, config?: any): Promise<void>;
+  load(data: T, config?: any): Promise<void | any>;
   
   /**
    * Get the name of this loader

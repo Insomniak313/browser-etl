@@ -1,10 +1,13 @@
-import { ITransformer, JoinConfig } from '../types';
+import { ITransformer } from '../types';
 
-export interface JoinTransformerConfig extends JoinConfig {
+export interface JoinTransformerConfig {
+  key: string;
+  mode: 'nested' | 'parallel';
   type: 'api' | 'data';
   url?: string;
   data?: any;
   options?: RequestInit;
+  joinFn?: (left: any, right: any) => any;
 }
 
 /**
@@ -107,7 +110,7 @@ export class JoinTransformer implements ITransformer {
     });
 
     // Process all unique keys
-    const allKeys = new Set([...leftMap.keys(), ...rightMap.keys()]);
+    const allKeys = new Set([...Array.from(leftMap.keys()), ...Array.from(rightMap.keys())]);
 
     allKeys.forEach(keyValue => {
       const leftItem = leftMap.get(keyValue);
