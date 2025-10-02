@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser ETL - Démonstration complète</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .demo-section {
+            margin: 30px 0;
+            padding: 30px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            background: #fafafa;
+        }
+        
+        .demo-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .demo-section h3 {
+            color: #555;
+            margin: 20px 0 10px 0;
+            font-size: 1.3em;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .result-area {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 100px;
+            background: white;
+            border: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .result-area.success {
+            border-color: #43e97b;
+            background: #f0fff4;
+            color: #2d7d32;
+        }
+        
+        .result-area.error {
+            border-color: #fa709a;
+            background: #fff5f5;
+            color: #c53030;
+        }
+        
+        .result-area.loading {
+            border-color: #4facfe;
+            background: #f0f9ff;
+            color: #2b6cb0;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .table-container {
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+        
+        .feature-card h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.success {
+            background: #43e97b;
+        }
+        
+        .status-indicator.error {
+            background: #fa709a;
+        }
+        
+        .status-indicator.loading {
+            background: #4facfe;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .footer a {
+            color: #4facfe;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 Browser ETL</h1>
+            <p>Pipeline Extract → Transform → Load dans votre navigateur</p>
+        </div>
+        
+        <div class="content">
+            <!-- Section des fonctionnalités -->
+            <div class="demo-section">
+                <h2>🎯 Fonctionnalités principales</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>🔍 Extracteurs</h4>
+                        <p>API REST, HTML, CSV, localStorage, IndexedDB, fichiers uploadés</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔄 Transformateurs</h4>
+                        <p>Filtrage, mapping, joins, enrichissement avec APIs tierces</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Loaders</h4>
+                        <p>Graphiques Chart.js, tableaux HTML, fichiers, APIs externes</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🚀 Performance</h4>
+                        <p>Cache, streams, parallélisme, gestion d'erreurs robuste</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Démonstration 1: API + Tableau -->
+            <div class="demo-section">
+                <h2>📊 Démonstration 1: Extraction API → Tableau</h2>
+                <p>Récupération de données depuis une API et affichage dans un tableau interactif.</p>
+                
+                <div class="code-block">
+etl()
+  .extract.api('https://api.example.com/users')
+  .filter(user => user.age > 25)
+  .load.table('#users-table', {
+    sortable: true,
+    searchable: true,
+    pagination: true
+  })
+  .run();
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="demo1()">🚀 Exécuter la démo</button>
+                    <button class="btn btn-secondary" onclick="clearDemo1()">🗑️ Effacer</button>
+                </div>
+                
+                <div id="demo1-result" class="result-area">
+                    Cliquez sur "Exécuter la démo" pour voir le résultat
+                </div>
+                
+                <div class="table-container" id="demo1-table" style="display: none;">
+                    <table id="users-table"></table>
+                </div>
+            </div>
+            
+            <!-- Démonstration 2: Graphiques -->
+            <div class="demo-section">
+                <h2>📈 Démonstration 2: Données → Graphiques</h2>
+                <p>Transformation de données et génération de graphiques interactifs.</p>
+                
+                <div class="code-block">
+etl()
+  .extract.api('https://api.example.com/sales')
+  .map(sale => ({
+    ...sale,
+    month: new Date(sale.date).getMonth(),
+    revenue: sale.quantity * sale.price
+  }))
+  .load.chart('bar', {
+    x: 'month',
+    y: 'revenue',
+    title: 'Revenus par mois'
+  })
+  .run();
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="demo2()">📊 Générer graphique</button>
+                    <button class="btn btn-secondary" onclick="clearDemo2()">🗑️ Effacer</button>
+                </div>
+                
+                <div id="demo2-result" class="result-area">
+                    Cliquez sur "Générer graphique" pour voir le résultat
+                </div>
+                
+                <div class="chart-container" id="demo2-chart" style="display: none;">
+                    <canvas id="sales-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Démonstration 3: Pipeline complet -->
+            <div class="demo-section">
+                <h2>🔄 Démonstration 3: Pipeline complet avec joins</h2>
+                <p>Pipeline complexe avec joins de données et enrichissement.</p>
+                
+                <div class="code-block">
+etl({
+  enableCache: true,
+  enableParallel: true,
+  enableErrorRecovery: true
+})
+  .extract.api('https://api.example.com/products')
+  .join.api('https://api.example.com/reviews', {
+    key: 'productId',
+    mode: 'nested'
+  })
+  .enrich(async (product) => {
+    const response = await fetch(`/api/ai/analyze/${product.id}`);
+    const analysis = await response.json();
+    return { ...product, sentiment: analysis.sentiment };
+  })
+  .filter(product => product.sentiment === 'positive')
+  .load.chart('pie', {
+    x: 'category',
+    y: 'count',
+    title: 'Produits positifs par catégorie'
+  })
+  .run();
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn" onclick="demo3()">🎯 Pipeline complet</button>
+                    <button class="btn btn-secondary" onclick="clearDemo3()">🗑️ Effacer</button>
+                </div>
+                
+                <div id="demo3-result" class="result-area">
+                    Cliquez sur "Pipeline complet" pour voir le résultat
+                </div>
+                
+                <div class="chart-container" id="demo3-chart" style="display: none;">
+                    <canvas id="products-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Démonstration 4: Fichiers CSV -->
+            <div class="demo-section">
+                <h2>📁 Démonstration 4: Traitement de fichiers CSV</h2>
+                <p>Upload et traitement de fichiers CSV avec transformation des données.</p>
+                
+                <div class="code-block">
+etl()
+  .extract.file(csvFile, 'csv')
+  .map(row => ({
+    ...row,
+    total: parseFloat(row.price) * parseInt(row.quantity),
+    category: row.price > 100 ? 'Premium' : 'Standard'
+  }))
+  .filter(item => item.total > 500)
+  .load.file('processed-data.csv', 'csv')
+  .run();
+                </div>
+                
+                <div class="button-group">
+                    <input type="file" id="csv-file" accept=".csv" style="display: none;" onchange="handleCSVUpload()">
+                    <button class="btn" onclick="document.getElementById('csv-file').click()">📁 Sélectionner CSV</button>
+                    <button class="btn btn-success" onclick="demo4()" id="demo4-btn" disabled>⚡ Traiter CSV</button>
+                    <button class="btn btn-secondary" onclick="clearDemo4()">🗑️ Effacer</button>
+                </div>
+                
+                <div id="demo4-result" class="result-area">
+                    Sélectionnez un fichier CSV pour commencer
+                </div>
+                
+                <div class="table-container" id="demo4-table" style="display: none;">
+                    <table id="csv-data-table"></table>
+                </div>
+            </div>
+            
+            <!-- Section des statistiques -->
+            <div class="demo-section">
+                <h2>📊 Statistiques de performance</h2>
+                <div id="performance-stats" class="result-area">
+                    <div style="text-align: center;">
+                        <h3>🚀 Performance Browser ETL</h3>
+                        <p>Exécutez des démonstrations pour voir les statistiques en temps réel</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>📦 Browser ETL - Développé avec ❤️ pour le web moderne</p>
+            <p><a href="https://github.com/browser-etl/browser-etl">GitHub</a> | <a href="https://npmjs.com/package/browser-etl">NPM</a> | <a href="https://browser-etl.dev">Documentation</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Simulation de Browser ETL pour la démonstration
+        class MockETL {
+            constructor(config = {}) {
+                this.config = config;
+                this.steps = [];
+                this.startTime = null;
+            }
+
+            extract = {
+                api: (url, options) => {
+                    this.steps.push({ type: 'extract', method: 'api', url, options });
+                    return this;
+                },
+                file: (file, type) => {
+                    this.steps.push({ type: 'extract', method: 'file', file, type });
+                    return this;
+                }
+            };
+
+            filter = (fn) => {
+                this.steps.push({ type: 'transform', method: 'filter', fn });
+                return this;
+            };
+
+            map = (fn) => {
+                this.steps.push({ type: 'transform', method: 'map', fn });
+                return this;
+            };
+
+            join = {
+                api: (url, config) => {
+                    this.steps.push({ type: 'transform', method: 'join', url, config });
+                    return this;
+                }
+            };
+
+            enrich = (fn) => {
+                this.steps.push({ type: 'transform', method: 'enrich', fn });
+                return this;
+            };
+
+            load = {
+                table: (container, config) => {
+                    this.steps.push({ type: 'load', method: 'table', container, config });
+                    return this;
+                },
+                chart: (type, config) => {
+                    this.steps.push({ type: 'load', method: 'chart', type, config });
+                    return this;
+                },
+                file: (filename, format) => {
+                    this.steps.push({ type: 'load', method: 'file', filename, format });
+                    return this;
+                }
+            };
+
+            async run() {
+                this.startTime = performance.now();
+                
+                // Simulation des données
+                const mockUsers = [
+                    { id: 1, name: 'Alice', age: 28, city: 'Paris', salary: 45000 },
+                    { id: 2, name: 'Bob', age: 32, city: 'Lyon', salary: 52000 },
+                    { id: 3, name: 'Charlie', age: 25, city: 'Marseille', salary: 38000 },
+                    { id: 4, name: 'Diana', age: 35, city: 'Toulouse', salary: 58000 },
+                    { id: 5, name: 'Eve', age: 29, city: 'Nice', salary: 42000 }
+                ];
+
+                const mockSales = [
+                    { month: 0, revenue: 12000, quantity: 100 },
+                    { month: 1, revenue: 15000, quantity: 120 },
+                    { month: 2, revenue: 18000, quantity: 150 },
+                    { month: 3, revenue: 14000, quantity: 110 },
+                    { month: 4, revenue: 16000, quantity: 130 },
+                    { month: 5, revenue: 20000, quantity: 160 }
+                ];
+
+                const mockProducts = [
+                    { id: 1, name: 'Laptop', category: 'Electronics', price: 1200, sentiment: 'positive' },
+                    { id: 2, name: 'Book', category: 'Education', price: 25, sentiment: 'positive' },
+                    { id: 3, name: 'Phone', category: 'Electronics', price: 800, sentiment: 'negative' },
+                    { id: 4, name: 'Chair', category: 'Furniture', price: 150, sentiment: 'positive' },
+                    { id: 5, name: 'Tablet', category: 'Electronics', price: 600, sentiment: 'positive' }
+                ];
+
+                let data = mockUsers;
+
+                // Simulation du traitement
+                for (const step of this.steps) {
+                    switch (step.type) {
+                        case 'extract':
+                            if (step.method === 'api') {
+                                data = mockUsers;
+                            } else if (step.method === 'file') {
+                                data = this.csvData || [];
+                            }
+                            break;
+                        case 'transform':
+                            if (step.method === 'filter') {
+                                data = data.filter(step.fn);
+                            } else if (step.method === 'map') {
+                                data = data.map(step.fn);
+                            } else if (step.method === 'join') {
+                                // Simulation de join
+                                data = data.map(item => ({ ...item, joined: true }));
+                            } else if (step.method === 'enrich') {
+                                // Simulation d'enrichissement
+                                data = data.map(item => ({ ...item, enriched: true }));
+                            }
+                            break;
+                        case 'load':
+                            if (step.method === 'table') {
+                                await this.loadTable(step.container, data);
+                            } else if (step.method === 'chart') {
+                                if (step.type === 'bar') {
+                                    await this.loadChart('bar', step.config, mockSales);
+                                } else {
+                                    await this.loadChart(step.type, step.config, mockProducts);
+                                }
+                            } else if (step.method === 'file') {
+                                this.downloadFile(data, step.filename, step.format);
+                            }
+                            break;
+                    }
+                }
+
+                const duration = performance.now() - this.startTime;
+                this.updatePerformanceStats(duration, this.steps.length);
+
+                return data;
+            }
+
+            async loadTable(container, data) {
+                const table = document.querySelector(container);
+                if (!table) return;
+
+                table.innerHTML = '';
+                
+                if (data.length === 0) return;
+
+                // En-têtes
+                const headers = Object.keys(data[0]);
+                const headerRow = document.createElement('tr');
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.textContent = header.charAt(0).toUpperCase() + header.slice(1);
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
+
+                // Données
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    headers.forEach(header => {
+                        const td = document.createElement('td');
+                        td.textContent = item[header];
+                        row.appendChild(td);
+                    });
+                    table.appendChild(row);
+                });
+
+                table.closest('.table-container').style.display = 'block';
+            }
+
+            async loadChart(type, config, data) {
+                let canvas;
+                if (type === 'bar') {
+                    canvas = document.getElementById('sales-chart');
+                } else {
+                    canvas = document.getElementById('products-chart');
+                }
+                
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                
+                let chartData;
+                if (type === 'bar') {
+                    chartData = {
+                        labels: data.map(item => `Mois ${item.month + 1}`),
+                        datasets: [{
+                            label: 'Revenus',
+                            data: data.map(item => item.revenue),
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    };
+                } else {
+                    const categories = [...new Set(data.map(item => item.category))];
+                    chartData = {
+                        labels: categories,
+                        datasets: [{
+                            data: categories.map(cat => 
+                                data.filter(item => item.category === cat).length
+                            ),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 205, 86, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    };
+                }
+                
+                new Chart(ctx, {
+                    type: type,
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: config.title || 'Graphique'
+                            }
+                        }
+                    }
+                });
+
+                canvas.closest('.chart-container').style.display = 'block';
+            }
+
+            downloadFile(data, filename, format) {
+                const content = format === 'csv' ? this.convertToCSV(data) : JSON.stringify(data, null, 2);
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+            }
+
+            convertToCSV(data) {
+                if (data.length === 0) return '';
+                
+                const headers = Object.keys(data[0]);
+                const csvRows = [headers.join(',')];
+                
+                data.forEach(item => {
+                    const values = headers.map(header => {
+                        const value = item[header];
+                        return `"${value}"`;
+                    });
+                    csvRows.push(values.join(','));
+                });
+                
+                return csvRows.join('\n');
+            }
+
+            updatePerformanceStats(duration, steps) {
+                const statsDiv = document.getElementById('performance-stats');
+                statsDiv.innerHTML = `
+                    <div style="text-align: center;">
+                        <h3>📊 Statistiques de performance</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                            <div>
+                                <h4>⏱️ Durée d'exécution</h4>
+                                <p style="font-size: 2em; color: #667eea; font-weight: bold;">${duration.toFixed(2)}ms</p>
+                            </div>
+                            <div>
+                                <h4>🔧 Étapes exécutées</h4>
+                                <p style="font-size: 2em; color: #43e97b; font-weight: bold;">${steps}</p>
+                            </div>
+                            <div>
+                                <h4>🚀 Performance</h4>
+                                <p style="font-size: 2em; color: #fa709a; font-weight: bold;">${(steps / duration * 1000).toFixed(1)} ops/s</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Variables globales
+        let csvData = null;
+
+        // Fonctions de démonstration
+        window.demo1 = async () => {
+            const resultDiv = document.getElementById('demo1-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '<span class="status-indicator loading"></span>Exécution du pipeline...';
+
+            try {
+                const etl = new MockETL();
+                await etl
+                    .extract.api('https://api.example.com/users')
+                    .filter(user => user.age > 25)
+                    .load.table('#users-table', {
+                        sortable: true,
+                        searchable: true,
+                        pagination: true
+                    })
+                    .run();
+
+                resultDiv.className = 'result-area success';
+                resultDiv.innerHTML = '<span class="status-indicator success"></span>✅ Pipeline exécuté avec succès ! Données chargées dans le tableau.';
+            } catch (error) {
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `<span class="status-indicator error"></span>❌ Erreur: ${error.message}`;
+            }
+        };
+
+        window.clearDemo1 = () => {
+            document.getElementById('demo1-result').className = 'result-area';
+            document.getElementById('demo1-result').innerHTML = 'Cliquez sur "Exécuter la démo" pour voir le résultat';
+            document.getElementById('demo1-table').style.display = 'none';
+        };
+
+        window.demo2 = async () => {
+            const resultDiv = document.getElementById('demo2-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '<span class="status-indicator loading"></span>Génération du graphique...';
+
+            try {
+                const etl = new MockETL();
+                await etl
+                    .extract.api('https://api.example.com/sales')
+                    .map(sale => ({
+                        ...sale,
+                        month: sale.month,
+                        revenue: sale.revenue
+                    }))
+                    .load.chart('bar', {
+                        x: 'month',
+                        y: 'revenue',
+                        title: 'Revenus par mois'
+                    })
+                    .run();
+
+                resultDiv.className = 'result-area success';
+                resultDiv.innerHTML = '<span class="status-indicator success"></span>✅ Graphique généré avec succès !';
+            } catch (error) {
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `<span class="status-indicator error"></span>❌ Erreur: ${error.message}`;
+            }
+        };
+
+        window.clearDemo2 = () => {
+            document.getElementById('demo2-result').className = 'result-area';
+            document.getElementById('demo2-result').innerHTML = 'Cliquez sur "Générer graphique" pour voir le résultat';
+            document.getElementById('demo2-chart').style.display = 'none';
+        };
+
+        window.demo3 = async () => {
+            const resultDiv = document.getElementById('demo3-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '<span class="status-indicator loading"></span>Exécution du pipeline complet...';
+
+            try {
+                const etl = new MockETL({
+                    enableCache: true,
+                    enableParallel: true,
+                    enableErrorRecovery: true
+                });
+                await etl
+                    .extract.api('https://api.example.com/products')
+                    .join.api('https://api.example.com/reviews', {
+                        key: 'productId',
+                        mode: 'nested'
+                    })
+                    .enrich(async (product) => {
+                        // Simulation d'enrichissement
+                        return { ...product, enriched: true };
+                    })
+                    .filter(product => product.sentiment === 'positive')
+                    .load.chart('pie', {
+                        x: 'category',
+                        y: 'count',
+                        title: 'Produits positifs par catégorie'
+                    })
+                    .run();
+
+                resultDiv.className = 'result-area success';
+                resultDiv.innerHTML = '<span class="status-indicator success"></span>✅ Pipeline complet exécuté avec succès !';
+            } catch (error) {
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `<span class="status-indicator error"></span>❌ Erreur: ${error.message}`;
+            }
+        };
+
+        window.clearDemo3 = () => {
+            document.getElementById('demo3-result').className = 'result-area';
+            document.getElementById('demo3-result').innerHTML = 'Cliquez sur "Pipeline complet" pour voir le résultat';
+            document.getElementById('demo3-chart').style.display = 'none';
+        };
+
+        window.handleCSVUpload = () => {
+            const fileInput = document.getElementById('csv-file');
+            const resultDiv = document.getElementById('demo4-result');
+            const demoBtn = document.getElementById('demo4-btn');
+
+            if (fileInput.files[0]) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    const text = e.target.result;
+                    const lines = text.split('\n');
+                    const headers = lines[0].split(',');
+                    
+                    csvData = lines.slice(1).map(line => {
+                        const values = line.split(',');
+                        const obj = {};
+                        headers.forEach((header, index) => {
+                            obj[header.trim()] = values[index]?.trim();
+                        });
+                        return obj;
+                    });
+
+                    resultDiv.className = 'result-area success';
+                    resultDiv.innerHTML = `<span class="status-indicator success"></span>✅ Fichier CSV chargé: ${csvData.length} lignes`;
+                    demoBtn.disabled = false;
+                };
+                
+                reader.readAsText(file);
+            }
+        };
+
+        window.demo4 = async () => {
+            const resultDiv = document.getElementById('demo4-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '<span class="status-indicator loading"></span>Traitement du CSV...';
+
+            try {
+                const etl = new MockETL();
+                etl.csvData = csvData;
+                
+                await etl
+                    .extract.file(csvData, 'csv')
+                    .map(row => ({
+                        ...row,
+                        total: parseFloat(row.price || 0) * parseInt(row.quantity || 0),
+                        category: parseFloat(row.price || 0) > 100 ? 'Premium' : 'Standard'
+                    }))
+                    .filter(item => item.total > 500)
+                    .load.table('#csv-data-table')
+                    .run();
+
+                resultDiv.className = 'result-area success';
+                resultDiv.innerHTML = '<span class="status-indicator success"></span>✅ CSV traité avec succès ! Données filtrées et transformées.';
+            } catch (error) {
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `<span class="status-indicator error"></span>❌ Erreur: ${error.message}`;
+            }
+        };
+
+        window.clearDemo4 = () => {
+            document.getElementById('demo4-result').className = 'result-area';
+            document.getElementById('demo4-result').innerHTML = 'Sélectionnez un fichier CSV pour commencer';
+            document.getElementById('demo4-table').style.display = 'none';
+            document.getElementById('demo4-btn').disabled = true;
+            csvData = null;
+        };
+    </script>
+</body>
+</html>
