@@ -645,7 +645,10 @@ etl()
                     canvas = document.getElementById('products-chart');
                 }
                 
-                if (!canvas) return;
+                if (!canvas) {
+                    console.error('Canvas not found for chart type:', type);
+                    return;
+                }
 
                 // Destroy existing chart if it exists
                 if (canvas.chart) {
@@ -665,6 +668,9 @@ etl()
                     }
                 }
                 
+                // Debug: log the data to see what we're working with
+                console.log('Chart data for', type, ':', data);
+                
                 let chartData;
                 if (type === 'bar') {
                     // For countries data
@@ -683,11 +689,17 @@ etl()
                     const groupedData = {};
                     data.forEach(item => {
                         const key = item[config.x] || item.userId || 'Unknown';
-                        groupedData[key] = (groupedData[key] || 0) + (item[config.y] || item.commentCount || 1);
+                        const value = item[config.y] || item.commentCount || 1;
+                        groupedData[key] = (groupedData[key] || 0) + value;
                     });
                     
                     const labels = Object.keys(groupedData);
                     const values = Object.values(groupedData);
+                    
+                    // Debug: log grouped data
+                    console.log('Grouped data:', groupedData);
+                    console.log('Labels:', labels);
+                    console.log('Values:', values);
                     
                     chartData = {
                         labels: labels,
@@ -714,22 +726,36 @@ etl()
                     };
                 }
                 
-                canvas.chart = new Chart(ctx, {
-                    type: type,
-                    data: chartData,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: config.title || 'Chart'
+                // Debug: log final chart data
+                console.log('Final chart data:', chartData);
+                
+                try {
+                    canvas.chart = new Chart(ctx, {
+                        type: type,
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: config.title || 'Chart'
+                                }
                             }
                         }
-                    }
-                });
+                    });
 
-                canvas.closest('.chart-container').style.display = 'block';
+                    // Make sure the chart container is visible
+                    const container = canvas.closest('.chart-container');
+                    if (container) {
+                        container.style.display = 'block';
+                        console.log('Chart container made visible');
+                    } else {
+                        console.error('Chart container not found');
+                    }
+                } catch (error) {
+                    console.error('Error creating chart:', error);
+                }
             }
 
             downloadFile(data, filename, format) {
@@ -953,7 +979,9 @@ etl()
                     enableParallel: true,
                     enableErrorRecovery: true
                 });
-                await etl
+                
+                console.log('Starting demo3 pipeline...');
+                const result = await etl
                     .extract.api('https://jsonplaceholder.typicode.com/posts')
                     .join.api('https://jsonplaceholder.typicode.com/users', {
                         key: 'userId',
@@ -964,17 +992,26 @@ etl()
                         const comments = await response.json();
                         return { ...post, commentCount: comments.length };
                     })
-                    .filter(post => post.commentCount > 3)
+                    .filter(post => post.commentCount > 0)
                     .load.chart('pie', {
                         x: 'userId',
                         y: 'commentCount',
-                        title: 'Posts with High Comment Count by User'
+                        title: 'Posts Comment Count by User'
                     })
                     .run();
 
+                console.log('Demo3 pipeline completed successfully');
                 resultDiv.className = 'result-area success';
                 resultDiv.innerHTML = '<span class="status-indicator success"></span>✅ Complete pipeline executed successfully!';
+                
+                // Ensure the chart container is visible
+                const chartContainer = document.getElementById('demo3-chart');
+                if (chartContainer) {
+                    chartContainer.style.display = 'block';
+                    console.log('Chart container made visible in demo3');
+                }
             } catch (error) {
+                console.error('Demo3 error:', error);
                 resultDiv.className = 'result-area error';
                 resultDiv.innerHTML = `<span class="status-indicator error"></span>❌ Error: ${error.message}`;
             }
