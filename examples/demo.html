@@ -602,6 +602,15 @@ etl()
 
                 table.innerHTML = '';
                 
+                // Ensure data is an array
+                if (!Array.isArray(data)) {
+                    if (typeof data === 'object' && data !== null) {
+                        data = Object.values(data);
+                    } else {
+                        data = [data];
+                    }
+                }
+                
                 if (data.length === 0) return;
 
                 // En-têtes
@@ -644,6 +653,17 @@ etl()
                 }
 
                 const ctx = canvas.getContext('2d');
+                
+                // Check if data is an array, if not, convert it or handle appropriately
+                if (!Array.isArray(data)) {
+                    if (typeof data === 'object' && data !== null) {
+                        // Convert object to array of values
+                        data = Object.values(data);
+                    } else {
+                        // Handle primitive values
+                        data = [data];
+                    }
+                }
                 
                 let chartData;
                 if (type === 'bar') {
@@ -726,6 +746,15 @@ etl()
             }
 
             convertToCSV(data) {
+                // Ensure data is an array
+                if (!Array.isArray(data)) {
+                    if (typeof data === 'object' && data !== null) {
+                        data = Object.values(data);
+                    } else {
+                        data = [data];
+                    }
+                }
+                
                 if (data.length === 0) return '';
                 
                 const headers = Object.keys(data[0]);
