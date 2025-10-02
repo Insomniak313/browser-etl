@@ -1,4 +1,5 @@
 import { IExtractor } from '../types';
+import { parseCSV } from '../utils/csv-parser';
 
 export interface FileExtractorConfig {
   file: File;
@@ -70,16 +71,6 @@ export class FileExtractor implements IExtractor {
   }
 
   private parseCSV(csvString: string): any[] {
-    const lines = csvString.split('\n');
-    const rows: any[] = [];
-
-    for (const line of lines) {
-      if (line.trim()) {
-        const values = line.split(',').map(v => v.trim());
-        rows.push(values);
-      }
-    }
-
-    return rows;
+    return parseCSV(csvString, { header: false });
   }
 }

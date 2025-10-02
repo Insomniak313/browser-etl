@@ -47,6 +47,8 @@ export { PluginManager } from './plugins/plugin-manager';
 export { Cache } from './utils/cache';
 export { StreamProcessor } from './utils/stream';
 export { ErrorRecovery } from './utils/error-recovery';
+export { HttpClient } from './utils/http-client';
+export { parseCSV } from './utils/csv-parser';
 export { 
   generatePermalink, 
   createHtmlPermalink, 

@@ -1,4 +1,5 @@
 import { IExtractor } from '../types';
+import { parseCSV } from '../utils/csv-parser';
 
 export interface CsvExtractorConfig {
   data: string | File;
@@ -31,7 +32,7 @@ export class CsvExtractor implements IExtractor {
       csvString = data;
     }
 
-    return this.parseCSV(csvString, options);
+    return parseCSV(csvString, options);
   }
 
   supports(config: any): boolean {
@@ -47,90 +48,4 @@ export class CsvExtractor implements IExtractor {
     });
   }
 
-  private parseCSV(csvString: string, options: {
-    header?: boolean;
-    delimiter?: string;
-    skipEmptyLines?: boolean;
-    transform?: (row: any) => any;
-  }): any[] {
-    const {
-      header = true,
-      delimiter = ',',
-      skipEmptyLines = true,
-      transform
-    } = options;
-
-    const lines = csvString.split('\n');
-    const rows: any[] = [];
-
-    let headers: string[] = [];
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      
-      if (skipEmptyLines && !line) {
-        continue;
-      }
-
-      const values = this.parseCSVLine(line, delimiter);
-
-      if (i === 0 && header) {
-        headers = values;
-        continue;
-      }
-
-      let row: any;
-
-      if (header && headers.length > 0) {
-        row = {};
-        headers.forEach((header, index) => {
-          row[header] = values[index] || '';
-        });
-      } else {
-        row = values;
-      }
-
-      if (transform) {
-        row = transform(row);
-      }
-
-      rows.push(row);
-    }
-
-    return rows;
-  }
-
-  private parseCSVLine(line: string, delimiter: string): string[] {
-    const values: string[] = [];
-    let current = '';
-    let inQuotes = false;
-    let i = 0;
-
-    while (i < line.length) {
-      const char = line[i];
-      const nextChar = line[i + 1];
-
-      if (char === '"') {
-        if (inQuotes && nextChar === '"') {
-          // Escaped quote
-          current += '"';
-          i += 2;
-          continue;
-        } else {
-          // Toggle quote state
-          inQuotes = !inQuotes;
-        }
-      } else if (char === delimiter && !inQuotes) {
-        values.push(current);
-        current = '';
-      } else {
-        current += char;
-      }
-
-      i++;
-    }
-
-    values.push(current);
-    return values;
-  }
 }

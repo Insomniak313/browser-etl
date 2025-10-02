@@ -1,4 +1,5 @@
 import { IExtractor } from '../types';
+import { HttpClient } from '../utils/http-client';
 
 export interface ApiExtractorConfig {
   url: string;
@@ -15,6 +16,11 @@ export interface ApiExtractorConfig {
  */
 export class ApiExtractor implements IExtractor {
   readonly name = 'api';
+  private httpClient: HttpClient;
+
+  constructor() {
+    this.httpClient = new HttpClient();
+  }
 
   async extract(config: ApiExtractorConfig): Promise<any> {
     if (!config.url) {
@@ -31,69 +37,25 @@ export class ApiExtractor implements IExtractor {
       retries = 3
     } = config;
 
-    const requestOptions: RequestInit = {
+    const response = await this.httpClient.request(url, {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-        ...options.headers
-      },
+      headers,
+      body,
+      timeout,
+      retries,
       ...options
-    };
+    });
 
-    if (body) {
-      requestOptions.body = typeof body === 'string' ? body : JSON.stringify(body);
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json();
+    } else {
+      return await response.text();
     }
-
-    return await this.fetchWithRetry(url, requestOptions, retries, timeout);
   }
 
   supports(config: any): boolean {
     return config && typeof config.url === 'string';
   }
 
-  private async fetchWithRetry(
-    url: string, 
-    options: RequestInit, 
-    retries: number, 
-    timeout: number
-  ): Promise<any> {
-    let lastError: Error;
-
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-        const response = await fetch(url, {
-          ...options,
-          signal: controller.signal
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          return await response.json();
-        } else {
-          return await response.text();
-        }
-
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
-        
-        if (attempt < retries) {
-          // Exponential backoff
-          const delay = Math.pow(2, attempt) * 1000;
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
-    }
-
-    throw lastError!;
-  }
 }
