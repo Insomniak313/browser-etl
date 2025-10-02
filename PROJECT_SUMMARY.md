@@ -1,151 +1,152 @@
-# 📦 Browser ETL - Résumé du projet
+# 📦 Browser ETL - Project Summary
 
-## 🎯 Objectif accompli
+## 🎯 Objective Accomplished
 
-**Browser ETL** est une librairie JavaScript complète et fonctionnelle qui permet d'exécuter des pipelines **Extract → Transform → Load** directement dans le navigateur, sans backend.
+**Browser ETL** is a complete and functional JavaScript library that allows executing **Extract → Transform → Load** pipelines directly in the browser, without a backend.
 
-## ✅ Fonctionnalités implémentées
+## ✅ Implemented Features
 
-### 🔍 Extracteurs (Sources de données)
-- ✅ **API REST** (`ApiExtractor`) - Récupération avec retry, timeout, headers personnalisés
-- ✅ **HTML** (`HtmlExtractor`) - Extraction depuis DOM ou URL avec sélecteurs CSS
-- ✅ **CSV** (`CsvExtractor`) - Parsing de fichiers CSV avec options configurables
-- ✅ **localStorage** (`LocalStorageExtractor`) - Accès aux données stockées localement
-- ✅ **IndexedDB** (`IndexedDBExtractor`) - Accès aux bases de données IndexedDB
-- ✅ **Fichiers** (`FileExtractor`) - Upload et traitement de fichiers (text, json, csv, binary)
+### 🔍 Extractors (Data Sources)
+- ✅ **REST API** (`ApiExtractor`) - Retrieval with retry, timeout, custom headers
+- ✅ **HTML** (`HtmlExtractor`) - Extraction from DOM or URL with CSS selectors
+- ✅ **CSV** (`CsvExtractor`) - CSV file parsing with configurable options
+- ✅ **localStorage** (`LocalStorageExtractor`) - Access to locally stored data
+- ✅ **IndexedDB** (`IndexedDBExtractor`) - Access to IndexedDB databases
+- ✅ **Files** (`FileExtractor`) - Upload and file processing (text, json, csv, binary)
 
-### 🔄 Transformateurs
-- ✅ **Filtrage** (`FilterTransformer`) - Filtrage avec fonctions personnalisées
-- ✅ **Mapping** (`MapTransformer`) - Transformation de données avec fonctions
-- ✅ **Joins** (`JoinTransformer`) - Joins nested/parallel avec APIs ou données
-- ✅ **Enrichissement** (`EnrichTransformer`) - Enrichissement asynchrone avec parallélisme
+### 🔄 Transformers
+- ✅ **Filtering** (`FilterTransformer`) - Filtering with custom functions
+- ✅ **Mapping** (`MapTransformer`) - Data transformation with functions
+- ✅ **Joins** (`JoinTransformer`) - Nested/parallel joins with APIs or data
+- ✅ **Enrichment** (`EnrichTransformer`) - Asynchronous enrichment with parallelism
 
 ### 📊 Loaders (Destinations)
-- ✅ **Graphiques** (`ChartLoader`) - Génération de graphiques Chart.js (bar, pie, line, scatter)
-- ✅ **Tableaux** (`TableLoader`) - Affichage dans tableaux HTML avec tri, recherche, pagination
-- ✅ **Fichiers** (`FileLoader`) - Téléchargement de fichiers (json, csv, txt, xml)
-- ✅ **APIs** (`ApiLoader`) - Envoi vers APIs externes avec retry et gestion d'erreurs
+- ✅ **Charts** (`ChartLoader`) - Chart.js chart generation (bar, pie, line, scatter)
+- ✅ **Tables** (`TableLoader`) - Display in HTML tables with sorting, search, pagination
+- ✅ **Files** (`FileLoader`) - File downloads (json, csv, txt, xml)
+- ✅ **APIs** (`ApiLoader`) - Send to external APIs with retry and error handling
 
-### 🏗️ Architecture et Performance
-- ✅ **Pipeline ETL** (`ETLPipeline`) - Système de pipeline modulaire et extensible
-- ✅ **API Fluent** (`ETL`) - Interface fluide et intuitive
-- ✅ **Cache** (`Cache`) - Système de cache avec TTL et nettoyage automatique
-- ✅ **Streams** (`StreamProcessor`) - Traitement par streams pour gros datasets
-- ✅ **Gestion d'erreurs** (`ErrorRecovery`) - Récupération d'erreurs avec retry et backoff
-- ✅ **Plugins** (`PluginManager`) - Système de plugins extensible
+### 🏗️ Architecture and Performance
+- ✅ **ETL Pipeline** (`ETLPipeline`) - Modular and extensible pipeline system
+- ✅ **Fluent API** (`ETL`) - Fluid and intuitive interface
+- ✅ **Cache** (`Cache`) - Cache system with TTL and automatic cleanup
+- ✅ **Streams** (`StreamProcessor`) - Stream processing for large datasets
+- ✅ **Error Handling** (`ErrorRecovery`) - Error recovery with retry and backoff
+- ✅ **Plugins** (`PluginManager`) - Extensible plugin system
 
-### 🧪 Tests et Qualité
-- ✅ **Tests unitaires** - Tests pour extracteurs, transformateurs, utilitaires
-- ✅ **Tests d'intégration** - Tests de pipelines complets
-- ✅ **Configuration TypeScript** - Types stricts et interfaces bien définies
-- ✅ **ESLint** - Configuration de linting pour la qualité du code
+### 🧪 Testing and Quality
+- ✅ **Unit Tests** - Tests for extractors, transformers, utilities
+- ✅ **Integration Tests** - Complete pipeline tests
+- ✅ **TypeScript Configuration** - Strict types and well-defined interfaces
+- ✅ **ESLint** - Linting configuration for code quality
 
-### 📚 Documentation et Exemples
-- ✅ **README complet** - Documentation détaillée avec exemples
-- ✅ **Exemples HTML** - Démonstrations interactives dans le navigateur
-- ✅ **Exemples avancés** - Cas d'usage complexes avec plugins personnalisés
-- ✅ **API Reference** - Documentation complète de l'API
+### 📚 Documentation and Examples
+- ✅ **Complete README** - Detailed documentation with examples
+- ✅ **HTML Examples** - Interactive demonstrations in the browser
+- ✅ **Advanced Examples** - Complex use cases with custom plugins
+- ✅ **API Reference** - Complete API documentation
 
-## 🏛️ Architecture SOLID
+## 🏛️ SOLID Architecture
 
 ### ✅ Single Responsibility Principle
-- Chaque extracteur, transformateur et loader a une responsabilité unique
-- Séparation claire des préoccupations
+- Each extractor, transformer and loader has a single responsibility
+- Clear separation of concerns
 
 ### ✅ Open/Closed Principle
-- Système de plugins pour extension sans modification du cœur
-- Interfaces extensibles
+- Plugin system for extension without modifying the core
+- Extensible interfaces
 
 ### ✅ Liskov Substitution Principle
-- Tous les extracteurs/loaders respectent la même interface
-- Substitution transparente des composants
+- All extractors/loaders respect the same interface
+- Transparent component substitution
 
 ### ✅ Interface Segregation Principle
-- Interfaces minimales et spécialisées
-- Pas de dépendances inutiles
+- Minimal and specialized interfaces
+- No unnecessary dependencies
 
 ### ✅ Dependency Inversion Principle
-- Dépendance d'abstractions (interfaces)
-- Injection de dépendances via le système de plugins
+- Depend on abstractions (interfaces)
+- Dependency injection via the plugin system
 
-## 🚀 Exemples d'utilisation
+## 🚀 Usage Examples
 
-### Exemple simple
+### Simple Example
 ```javascript
 import { etl } from 'browser-etl';
 
 etl()
-  .extract.api('https://api.example.com/users')
-  .filter(user => user.age > 18)
+  .extract.api('https://jsonplaceholder.typicode.com/users')
+  .filter(user => user.id <= 5)
   .load.table('#users-table')
   .run();
 ```
 
-### Exemple complexe avec joins
+### Complex Example with Joins
 ```javascript
 etl()
-  .extract.api('https://api.example.com/users')
-  .join.api('https://api.weather.com', {
-    key: 'city',
+  .extract.api('https://jsonplaceholder.typicode.com/posts')
+  .join.api('https://jsonplaceholder.typicode.com/users', {
+    key: 'userId',
     mode: 'nested'
   })
-  .enrich(async (user) => {
-    const response = await fetch(`/api/ai/analyze/${user.id}`);
-    return { ...user, sentiment: await response.json() };
+  .enrich(async (post) => {
+    const response = await fetch(`https://jsonplaceholder.typicode.com/comments?postId=${post.id}`);
+    const comments = await response.json();
+    return { ...post, commentCount: comments.length };
   })
-  .load.chart('bar', { x: 'city', y: 'temperature' })
+  .load.chart('bar', { x: 'userId', y: 'commentCount' })
   .run();
 ```
 
-## 📁 Structure du projet
+## 📁 Project Structure
 
 ```
 browser-etl/
 ├── src/
-│   ├── core/           # Pipeline principal et API ETL
-│   ├── extractors/     # Extracteurs (API, HTML, CSV, etc.)
-│   ├── transformers/   # Transformateurs (filter, map, join, enrich)
+│   ├── core/           # Main pipeline and ETL API
+│   ├── extractors/     # Extractors (API, HTML, CSV, etc.)
+│   ├── transformers/   # Transformers (filter, map, join, enrich)
 │   ├── loaders/        # Loaders (chart, table, file, api)
-│   ├── plugins/         # Système de plugins
-│   ├── utils/          # Utilitaires (cache, streams, error recovery)
-│   ├── types/          # Types TypeScript
-│   └── index.ts        # Point d'entrée principal
-├── tests/              # Tests unitaires et d'intégration
-├── examples/           # Exemples et démonstrations
-├── package.json        # Configuration NPM
-├── tsconfig.json       # Configuration TypeScript
-├── rollup.config.js    # Configuration de build
+│   ├── plugins/         # Plugin system
+│   ├── utils/          # Utilities (cache, streams, error recovery)
+│   ├── types/          # TypeScript types
+│   └── index.ts        # Main entry point
+├── tests/              # Unit and integration tests
+├── examples/           # Examples and demonstrations
+├── package.json        # NPM configuration
+├── tsconfig.json       # TypeScript configuration
+├── rollup.config.js    # Build configuration
 └── README.md          # Documentation
 ```
 
-## 🎯 Cas d'usage supportés
+## 🎯 Supported Use Cases
 
-1. **Dashboard météo** - Extraction d'APIs météo + joins + graphiques
-2. **Analyse de sentiment** - Enrichissement avec IA + visualisation
-3. **Pipeline financier** - Données boursières + calculs + tableaux
-4. **Traitement CSV** - Upload + transformation + export
-5. **Web scraping** - Extraction HTML + transformation + stockage
+1. **Weather Dashboard** - Weather API extraction + joins + charts
+2. **Sentiment Analysis** - AI enrichment + visualization
+3. **Financial Pipeline** - Stock data + calculations + tables
+4. **CSV Processing** - Upload + transformation + export
+5. **Web Scraping** - HTML extraction + transformation + storage
 
-## 🔧 Configuration et Build
+## 🔧 Configuration and Build
 
-- **TypeScript** - Types stricts et interfaces bien définies
-- **Rollup** - Build optimisé pour navigateur et Node.js
-- **Vitest** - Tests rapides et modernes
-- **ESLint** - Qualité du code
-- **Chart.js** - Support des graphiques (peer dependency)
+- **TypeScript** - Strict types and well-defined interfaces
+- **Rollup** - Optimized build for browser and Node.js
+- **Vitest** - Fast and modern tests
+- **ESLint** - Code quality
+- **Chart.js** - Chart support (peer dependency)
 
-## 🚀 Prêt pour la production
+## 🚀 Production Ready
 
-La librairie Browser ETL est maintenant **complète et prête pour la production** avec :
+The Browser ETL library is now **complete and production ready** with:
 
-- ✅ Architecture robuste et extensible
-- ✅ Tests complets
-- ✅ Documentation détaillée
-- ✅ Exemples fonctionnels
-- ✅ Gestion d'erreurs avancée
-- ✅ Performance optimisée
-- ✅ Support des cas d'usage complexes
+- ✅ Robust and extensible architecture
+- ✅ Complete tests
+- ✅ Detailed documentation
+- ✅ Functional examples
+- ✅ Advanced error handling
+- ✅ Optimized performance
+- ✅ Support for complex use cases
 
-## 🎉 Résultat final
+## 🎉 Final Result
 
-**Browser ETL** est une librairie JavaScript moderne, légère et puissante qui permet de créer des pipelines de données sophistiqués directement dans le navigateur, respectant les principes SOLID et offrant une expérience développeur exceptionnelle.
+**Browser ETL** is a modern, lightweight and powerful JavaScript library that allows creating sophisticated data pipelines directly in the browser, following SOLID principles and offering an exceptional developer experience.

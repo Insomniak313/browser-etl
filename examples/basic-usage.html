@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Browser ETL - Exemple basique</title>
+    <title>Browser ETL - Basic Example</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -64,18 +64,18 @@
     </style>
 </head>
 <body>
-    <h1>📦 Browser ETL - Exemple basique</h1>
+    <h1>📦 Browser ETL - Basic Example</h1>
     
     <div class="container">
-        <h2>1. Extraction d'API et affichage en tableau</h2>
-        <button onclick="loadUsersTable()">Charger les utilisateurs</button>
+        <h2>1. API Extraction and Table Display</h2>
+        <button onclick="loadUsersTable()">Load Users</button>
         <div id="table-result"></div>
         <table id="users-table" style="display: none;"></table>
     </div>
 
     <div class="container">
-        <h2>2. Extraction d'API et graphique</h2>
-        <button onclick="loadUsersChart()">Générer le graphique</button>
+        <h2>2. API Extraction and Chart</h2>
+        <button onclick="loadUsersChart()">Generate Chart</button>
         <div id="chart-result"></div>
         <div class="chart-container">
             <canvas id="users-chart" style="display: none;"></canvas>
@@ -83,16 +83,16 @@
     </div>
 
     <div class="container">
-        <h2>3. Traitement de données CSV</h2>
+        <h2>3. CSV Data Processing</h2>
         <input type="file" id="csv-file" accept=".csv" />
-        <button onclick="processCSV()">Traiter le CSV</button>
+        <button onclick="processCSV()">Process CSV</button>
         <div id="csv-result"></div>
         <table id="csv-table" style="display: none;"></table>
     </div>
 
     <div class="container">
-        <h2>4. Pipeline complet avec joins</h2>
-        <button onclick="runCompletePipeline()">Exécuter le pipeline complet</button>
+        <h2>4. Complete Pipeline with Joins</h2>
+        <button onclick="runCompletePipeline()">Run Complete Pipeline</button>
         <div id="pipeline-result"></div>
         <div class="chart-container">
             <canvas id="pipeline-chart" style="display: none;"></canvas>
@@ -100,7 +100,7 @@
     </div>
 
     <script type="module">
-        // Simulation de Browser ETL (en attendant la compilation)
+        // Browser ETL simulation (while waiting for compilation)
         class MockETL {
             constructor() {
                 this.steps = [];
@@ -146,24 +146,22 @@
             };
 
             async run() {
-                console.log('Exécution du pipeline:', this.steps);
+                console.log('Pipeline execution:', this.steps);
                 
-                // Simulation des données
-                const mockUsers = [
-                    { id: 1, name: 'Alice', age: 25, city: 'Paris' },
-                    { id: 2, name: 'Bob', age: 30, city: 'Lyon' },
-                    { id: 3, name: 'Charlie', age: 35, city: 'Marseille' },
-                    { id: 4, name: 'Diana', age: 28, city: 'Toulouse' }
-                ];
+                let data = [];
 
-                let data = mockUsers;
-
-                // Simulation du traitement
+                // Process each step
                 for (const step of this.steps) {
                     switch (step.type) {
                         case 'extract':
                             if (step.method === 'api') {
-                                data = mockUsers;
+                                try {
+                                    const response = await fetch(step.url);
+                                    data = await response.json();
+                                } catch (error) {
+                                    console.error('API fetch error:', error);
+                                    data = [];
+                                }
                             }
                             break;
                         case 'transform':
@@ -220,24 +218,68 @@
                 const canvas = document.getElementById('users-chart') || document.getElementById('pipeline-chart');
                 if (!canvas) return;
 
+                // Destroy existing chart if it exists
+                if (canvas.chart) {
+                    canvas.chart.destroy();
+                }
+
                 const ctx = canvas.getContext('2d');
                 
-                // Créer le graphique
-                new Chart(ctx, {
-                    type: type,
-                    data: {
-                        labels: data.map(item => item.name),
+                // Create chart with real data
+                let chartData;
+                if (type === 'pie') {
+                    // Group data by category
+                    const groupedData = {};
+                    data.forEach(item => {
+                        const key = item.category || item.name || 'Unknown';
+                        groupedData[key] = (groupedData[key] || 0) + 1;
+                    });
+                    
+                    chartData = {
+                        labels: Object.keys(groupedData),
                         datasets: [{
-                            label: 'Âge',
-                            data: data.map(item => item.age),
+                            data: Object.values(groupedData),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 205, 86, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    };
+                } else {
+                    // Bar chart
+                    chartData = {
+                        labels: data.map(item => item.name || item.title || 'Unknown'),
+                        datasets: [{
+                            label: 'Value',
+                            data: data.map(item => item.id || item.userId || 1),
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1
                         }]
-                    },
+                    };
+                }
+                
+                canvas.chart = new Chart(ctx, {
+                    type: type,
+                    data: chartData,
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: config.title || 'Chart'
+                            }
+                        }
                     }
                 });
 
@@ -245,39 +287,39 @@
             }
         }
 
-        // Fonctions globales pour les boutons
+        // Global functions for buttons
         window.loadUsersTable = async () => {
             const resultDiv = document.getElementById('table-result');
-            resultDiv.innerHTML = '<p>Chargement...</p>';
+            resultDiv.innerHTML = '<p>Loading...</p>';
 
             try {
                 const etl = new MockETL();
                 await etl
-                    .extract.api('https://api.example.com/users')
-                    .filter(user => user.age > 25)
+                    .extract.api('https://jsonplaceholder.typicode.com/users')
+                    .filter(user => user.id <= 5)
                     .load.table('#users-table')
                     .run();
 
-                resultDiv.innerHTML = '<p class="success">✅ Utilisateurs chargés avec succès !</p>';
+                resultDiv.innerHTML = '<p class="success">✅ Users loaded successfully!</p>';
             } catch (error) {
-                resultDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
             }
         };
 
         window.loadUsersChart = async () => {
             const resultDiv = document.getElementById('chart-result');
-            resultDiv.innerHTML = '<p>Génération du graphique...</p>';
+            resultDiv.innerHTML = '<p>Generating chart...</p>';
 
             try {
                 const etl = new MockETL();
                 await etl
-                    .extract.api('https://api.example.com/users')
-                    .load.chart('bar', { x: 'name', y: 'age' })
+                    .extract.api('https://jsonplaceholder.typicode.com/users')
+                    .load.chart('bar', { x: 'name', y: 'id', title: 'Users by ID' })
                     .run();
 
-                resultDiv.innerHTML = '<p class="success">✅ Graphique généré avec succès !</p>';
+                resultDiv.innerHTML = '<p class="success">✅ Chart generated successfully!</p>';
             } catch (error) {
-                resultDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
             }
         };
 
@@ -286,17 +328,17 @@
             const resultDiv = document.getElementById('csv-result');
             
             if (!fileInput.files[0]) {
-                resultDiv.innerHTML = '<p class="error">❌ Veuillez sélectionner un fichier CSV</p>';
+                resultDiv.innerHTML = '<p class="error">❌ Please select a CSV file</p>';
                 return;
             }
 
-            resultDiv.innerHTML = '<p>Traitement du CSV...</p>';
+            resultDiv.innerHTML = '<p>Processing CSV...</p>';
 
             try {
                 const file = fileInput.files[0];
                 const text = await file.text();
                 
-                // Parse CSV simple
+                // Simple CSV parsing
                 const lines = text.split('\n');
                 const headers = lines[0].split(',');
                 const data = lines.slice(1).map(line => {
@@ -308,7 +350,7 @@
                     return obj;
                 });
 
-                // Afficher dans le tableau
+                // Display in table
                 const table = document.getElementById('csv-table');
                 table.innerHTML = '';
                 
@@ -331,28 +373,28 @@
                 });
 
                 table.style.display = 'table';
-                resultDiv.innerHTML = '<p class="success">✅ CSV traité avec succès !</p>';
+                resultDiv.innerHTML = '<p class="success">✅ CSV processed successfully!</p>';
             } catch (error) {
-                resultDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
             }
         };
 
         window.runCompletePipeline = async () => {
             const resultDiv = document.getElementById('pipeline-result');
-            resultDiv.innerHTML = '<p>Exécution du pipeline complet...</p>';
+            resultDiv.innerHTML = '<p>Running complete pipeline...</p>';
 
             try {
                 const etl = new MockETL();
                 await etl
-                    .extract.api('https://api.example.com/users')
-                    .filter(user => user.age > 25)
-                    .map(user => ({ ...user, category: user.age > 30 ? 'Senior' : 'Junior' }))
-                    .load.chart('pie', { x: 'category', y: 'count' })
+                    .extract.api('https://jsonplaceholder.typicode.com/posts')
+                    .filter(post => post.id <= 10)
+                    .map(post => ({ ...post, category: post.id > 5 ? 'Recent' : 'Older' }))
+                    .load.chart('pie', { x: 'category', y: 'count', title: 'Posts by Category' })
                     .run();
 
-                resultDiv.innerHTML = '<p class="success">✅ Pipeline exécuté avec succès !</p>';
+                resultDiv.innerHTML = '<p class="success">✅ Pipeline executed successfully!</p>';
             } catch (error) {
-                resultDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
             }
         };
     </script>
