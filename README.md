@@ -1,5 +1,7 @@
 # 📦 Browser ETL
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-🚀%20Try%20it%20now-blue?style=for-the-badge&logo=github)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/Insomniak313/browser-etl/main/examples/demo.html)
+
 A lightweight and extensible JavaScript library for executing **Extract → Transform → Load** pipelines directly in the browser, without a backend.
 
 ## 🚀 Installation
