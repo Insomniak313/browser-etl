@@ -5,8 +5,6 @@ import { StreamConfig } from '../types';
  */
 export class StreamProcessor<T> {
   private config: StreamConfig;
-  private buffer: T[] = [];
-  private processing = false;
 
   constructor(config: StreamConfig) {
     this.config = config;
@@ -83,31 +81,32 @@ export class StreamProcessor<T> {
    */
   createReadableStream(data: T[]): ReadableStream<T> {
     let index = 0;
+    const config = this.config;
 
     return new ReadableStream({
-      start(controller) {
+      start: (controller) => {
         // Initial data
-        this.pushData(controller);
+        pushData(controller);
       },
 
-      pull(controller) {
-        this.pushData(controller);
-      },
-
-      pushData: (controller: ReadableStreamDefaultController<T>) => {
-        const endIndex = Math.min(index + this.config.bufferSize, data.length);
-        
-        for (let i = index; i < endIndex; i++) {
-          controller.enqueue(data[i]);
-        }
-        
-        index = endIndex;
-        
-        if (index >= data.length) {
-          controller.close();
-        }
+      pull: (controller) => {
+        pushData(controller);
       }
     });
+
+    function pushData(controller: ReadableStreamDefaultController<T>) {
+      const endIndex = Math.min(index + config.bufferSize, data.length);
+      
+      for (let i = index; i < endIndex; i++) {
+        controller.enqueue(data[i]);
+      }
+      
+      index = endIndex;
+      
+      if (index >= data.length) {
+        controller.close();
+      }
+    }
   }
 
   /**
@@ -166,7 +165,7 @@ export class StreamProcessor<T> {
         const readers = streams.map(stream => stream.getReader());
         let completedCount = 0;
         
-        const pump = async (reader: ReadableStreamDefaultReader<T>, index: number) => {
+         const pump = async (reader: ReadableStreamDefaultReader<T>, _index: number) => {
           try {
             while (true) {
               const { done, value } = await reader.read();

@@ -56,4 +56,5 @@ export {
 } from './utils/permalink';
 
 // Default export
+import { etl } from './core/etl';
 export default etl;

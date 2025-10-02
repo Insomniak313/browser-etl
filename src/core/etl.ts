@@ -15,6 +15,27 @@ import { FileLoader } from '../loaders/file';
 import { ApiLoader } from '../loaders/api';
 import { ETLConfig } from '../types';
 
+interface ExtractMethods {
+  api: (url: string, options?: RequestInit) => ETL;
+  html: (selector: string, url?: string) => ETL;
+  csv: (data: string | File, options?: any) => ETL;
+  localStorage: (key: string) => ETL;
+  indexedDB: (storeName: string, query?: any) => ETL;
+  file: (file: File, type?: string) => ETL;
+}
+
+interface JoinMethods {
+  api: (url: string, config: any) => ETL;
+  data: (data: any, config: any) => ETL;
+}
+
+interface LoadMethods {
+  chart: (type: string, config: any) => ETL;
+  table: (container: string | HTMLElement, config?: any) => ETL;
+  file: (filename: string, format?: string) => ETL;
+  api: (url: string, options?: RequestInit) => ETL;
+}
+
 /**
  * Main ETL class that provides a fluent API
  */
@@ -57,7 +78,7 @@ export class ETL {
   /**
    * Extract from API
    */
-  extract = {
+  extract: ExtractMethods = {
     api: (url: string, options?: RequestInit) => {
       this.pipeline.extract('api', { url, options });
       return this;
@@ -100,7 +121,7 @@ export class ETL {
   /**
    * Join data with another source
    */
-  join = {
+  join: JoinMethods = {
     api: (url: string, config: any) => {
       this.pipeline.transform('join', { 
         type: 'api', 
@@ -147,7 +168,7 @@ export class ETL {
   /**
    * Load data
    */
-  load = {
+  load: LoadMethods = {
     chart: (type: string, config: any) => {
       this.pipeline.load('chart', { type, config });
       return this;
