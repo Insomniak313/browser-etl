@@ -3,23 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced ETL Pipeline with Permalink Sharing</title>
+    <title>Test - Code Éditable en Mode WYSIWYG</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            margin: 0;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -38,11 +33,6 @@
             font-size: 2.5em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
         }
         
         .content {
@@ -152,32 +142,6 @@
             margin: 0;
         }
         
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .feature-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 5px solid #667eea;
-        }
-        
-        .feature-card h4 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        
-        .feature-card p {
-            color: #666;
-            line-height: 1.6;
-        }
-        
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -195,21 +159,6 @@
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         }
         
         .result-area {
@@ -243,224 +192,149 @@
             color: #2b6cb0;
         }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
             margin: 20px 0;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 5px;
         }
         
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
+        .instructions h3 {
+            color: #1976d2;
+            margin-top: 0;
         }
         
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 5px 0;
             color: #333;
-        }
-        
-        tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .footer {
-            background: #2d3748;
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        
-        .footer a {
-            color: #4facfe;
-            text-decoration: none;
-        }
-        
-        .footer a:hover {
-            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 Advanced ETL Pipeline</h1>
-            <p>Complete data processing with permalink sharing using htmlpreview.github.com</p>
+            <h1>🧪 Test - Code Éditable</h1>
+            <p>Test de la fonctionnalité d'édition de code en mode WYSIWYG</p>
         </div>
         
         <div class="content">
-            <!-- Features Section -->
-            <div class="demo-section">
-                <h2>🎯 Key Features</h2>
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h4>📊 Multi-Source Extraction</h4>
-                        <p>Extract data from multiple APIs simultaneously with error handling and retry logic</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>🔄 Data Enrichment</h4>
-                        <p>Join and enrich data from different sources with user information and company details</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>📈 Advanced Analytics</h4>
-                        <p>Filter, aggregate, and analyze data with statistical calculations and grouping</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>🔗 Permalink Sharing</h4>
-                        <p>Generate shareable links using htmlpreview.github.com for easy collaboration</p>
-                    </div>
-                </div>
+            <div class="instructions">
+                <h3>📋 Instructions de Test</h3>
+                <ol>
+                    <li>Cliquez sur le bouton "✏️ Edit" dans un bloc de code</li>
+                    <li>Modifiez le code dans la zone de texte qui apparaît</li>
+                    <li>Cliquez sur "💾 Save" pour sauvegarder vos modifications</li>
+                    <li>Ou cliquez sur "❌ Cancel" pour annuler</li>
+                    <li>Testez l'exécution du code modifié avec le bouton "Run Test"</li>
+                </ol>
             </div>
             
-            <!-- Pipeline Demo -->
+            <!-- Test 1: Code JavaScript Simple -->
             <div class="demo-section">
-                <h2>🔄 Advanced Pipeline Demo</h2>
-                <p>This demo shows a complete ETL pipeline that extracts data from multiple sources, enriches it, and generates shareable permalinks.</p>
+                <h2>🧪 Test 1: Code JavaScript Simple</h2>
+                <p>Testez l'édition d'un code JavaScript simple.</p>
                 
-                <div class="code-block editable" data-demo="runAdvancedPipeline">
+                <div class="code-block editable" data-demo="test1">
                     <div class="code-edit-controls">
                         <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
                     </div>
                     <div class="code-content">
-// Advanced ETL Pipeline with Permalink Sharing
-const pipeline = new AdvancedETLPipeline();
-
-// Run complete pipeline
-const results = await pipeline.runCompletePipeline();
-
-// Pipeline includes:
-// 1. Extract users and posts from APIs
-// 2. Enrich posts with user information
-// 3. Filter and aggregate by company
-// 4. Generate shareable permalink
-// 5. Create interactive results table
+// Test de code JavaScript simple
+const message = "Hello, World!";
+console.log(message);
+alert(message);
                     </div>
                 </div>
                 
-                <div class="button-group">
-                    <button class="btn btn-success" onclick="runAdvancedPipeline()">🚀 Run Advanced Pipeline</button>
-                    <button class="btn btn-warning" onclick="shareAdvancedDemo()">🔗 Share Demo</button>
-                    <button class="btn" onclick="clearAdvancedResults()">🗑️ Clear Results</button>
+                <button class="btn" onclick="runTest1()">🚀 Run Test 1</button>
+                <div id="test1-result" class="result-area">
+                    Cliquez sur "Run Test 1" pour exécuter le code
                 </div>
-                
-                <div id="advanced-result" class="result-area">
-                    Click "Run Advanced Pipeline" to see the complete ETL process with permalink sharing
-                </div>
-                
-                <div id="pipeline-results"></div>
             </div>
             
-            <!-- Permalink Information -->
+            <!-- Test 2: Code ETL Pipeline -->
             <div class="demo-section">
-                <h2>🔗 Permalink Sharing</h2>
-                <p>This demo uses the htmlpreview.github.com service to create shareable links for HTML content stored in GitHub repositories.</p>
+                <h2>🔄 Test 2: Pipeline ETL</h2>
+                <p>Testez l'édition d'un pipeline ETL complet.</p>
                 
-                <div class="code-block editable" data-demo="generatePermalink">
+                <div class="code-block editable" data-demo="test2">
                     <div class="code-edit-controls">
                         <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
                     </div>
                     <div class="code-content">
-// Generate permalink using htmlpreview.github.com
-const permalinkResult = await generatePermalink({
-    repository: 'https://github.com/user/repo',
-    branch: 'main',
-    filePath: 'examples/demo.html',
-    queryParams: {
-        timestamp: new Date().toISOString(),
-        data: JSON.stringify(results)
-    }
-});
-
-// Result: https://htmlpreview.github.io/?https://raw.githubusercontent.com/user/repo/main/examples/demo.html
+etl()
+  .extract.api('https://jsonplaceholder.typicode.com/users')
+  .filter(user => user.id <= 3)
+  .map(user => ({
+    name: user.name,
+    email: user.email,
+    city: user.address.city
+  }))
+  .load.table('#test-table')
+  .run();
                     </div>
                 </div>
                 
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h4>🌐 Public Access</h4>
-                        <p>Anyone with the permalink can view the HTML content without needing GitHub access</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>📱 Mobile Friendly</h4>
-                        <p>htmlpreview.github.com renders content responsively for all devices</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>⚡ Fast Loading</h4>
-                        <p>Content is served directly from GitHub's CDN for optimal performance</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>🔒 Secure</h4>
-                        <p>Uses GitHub's infrastructure for reliable and secure content delivery</p>
-                    </div>
+                <button class="btn" onclick="runTest2()">🚀 Run Test 2</button>
+                <div id="test2-result" class="result-area">
+                    Cliquez sur "Run Test 2" pour exécuter le pipeline
+                </div>
+                
+                <div id="test-table" style="display: none; margin-top: 20px;">
+                    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-weight: 600; color: #333;">Name</th>
+                                <th style="padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-weight: 600; color: #333;">Email</th>
+                                <th style="padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-weight: 600; color: #333;">City</th>
+                            </tr>
+                        </thead>
+                        <tbody id="test-table-body"></tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-        
-        <div class="footer">
-            <p>🚀 Advanced ETL Pipeline - Built with ❤️ for modern data processing</p>
-            <p><a href="https://github.com/Insomniak313/browser-etl">GitHub</a> | <a href="https://htmlpreview.github.io/">htmlpreview.github.com</a></p>
+            
+            <!-- Test 3: Code avec Fonctions -->
+            <div class="demo-section">
+                <h2>⚙️ Test 3: Code avec Fonctions</h2>
+                <p>Testez l'édition de code contenant des fonctions.</p>
+                
+                <div class="code-block editable" data-demo="test3">
+                    <div class="code-edit-controls">
+                        <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
+                    </div>
+                    <div class="code-content">
+function calculateSum(a, b) {
+    return a + b;
+}
+
+function calculateProduct(a, b) {
+    return a * b;
+}
+
+const result1 = calculateSum(5, 3);
+const result2 = calculateProduct(4, 7);
+
+console.log('Sum:', result1);
+console.log('Product:', result2);
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="runTest3()">🚀 Run Test 3</button>
+                <div id="test3-result" class="result-area">
+                    Cliquez sur "Run Test 3" pour exécuter les fonctions
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="advanced-pipeline.js"></script>
     <script>
-        // Permalink utility functions
-        async function generatePermalink(repository, branch = 'main', filePath) {
-            try {
-                const repoMatch = repository.match(/github\.com\/([^\/]+\/[^\/]+)/);
-                if (!repoMatch) {
-                    throw new Error('Invalid GitHub repository URL');
-                }
-
-                const repoPath = repoMatch[1];
-                const rawUrl = `https://raw.githubusercontent.com/${repoPath}/${branch}/${filePath}`;
-                const previewUrl = `https://htmlpreview.github.io/?${rawUrl}`;
-                
-                return {
-                    url: rawUrl,
-                    previewUrl: previewUrl,
-                    success: true
-                };
-            } catch (error) {
-                return {
-                    url: '',
-                    previewUrl: '',
-                    success: false,
-                    error: error.message
-                };
-            }
-        }
-
-        async function copyToClipboard(text) {
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(text);
-                    return true;
-                } else {
-                    const textArea = document.createElement('textarea');
-                    textArea.value = text;
-                    textArea.style.position = 'fixed';
-                    textArea.style.left = '-999999px';
-                    textArea.style.top = '-999999px';
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    
-                    const success = document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    return success;
-                }
-            } catch (error) {
-                console.error('Failed to copy to clipboard:', error);
-                return false;
-            }
-        }
-
         // Global variables for code editing
         let editedCodeBlocks = {}; // Store edited code for each demo
         
@@ -576,65 +450,103 @@ const permalinkResult = await generatePermalink({
         function getEditedCode(demoId) {
             return editedCodeBlocks[demoId] ? editedCodeBlocks[demoId].current : null;
         }
-
-        // Share advanced demo function
-        window.shareAdvancedDemo = async function() {
-            const repository = 'https://github.com/Insomniak313/browser-etl';
-            const filePath = `examples/advanced-pipeline.html`;
+        
+        // Test functions
+        window.runTest1 = function() {
+            const resultDiv = document.getElementById('test1-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '🔄 Executing Test 1...';
             
             try {
-                const result = await generatePermalink(repository, 'main', filePath);
-                
-                if (result.success) {
-                    const copied = await copyToClipboard(result.previewUrl);
-                    
-                    if (copied) {
-                        alert('🔗 Permalink copié dans le presse-papiers!\n\n' + result.previewUrl);
-                    } else {
-                        prompt('Partagez ce lien:', result.previewUrl);
-                    }
+                const editedCode = getEditedCode('test1');
+                if (editedCode) {
+                    // Execute the edited code
+                    eval(editedCode);
+                    resultDiv.className = 'result-area success';
+                    resultDiv.innerHTML = '✅ Test 1 executed successfully! Check console for output.';
                 } else {
-                    alert(`Erreur lors de la génération du permalink: ${result.error}`);
+                    // Execute original code
+                    const message = "Hello, World!";
+                    console.log(message);
+                    alert(message);
+                    resultDiv.className = 'result-area success';
+                    resultDiv.innerHTML = '✅ Test 1 executed successfully! Check console for output.';
                 }
             } catch (error) {
-                alert(`Erreur: ${error.message}`);
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
             }
         };
-
-        // Clear advanced results function
-        window.clearAdvancedResults = function() {
-            const resultDiv = document.getElementById('advanced-result');
-            const pipelineDiv = document.getElementById('pipeline-results');
-            
-            resultDiv.className = 'result-area';
-            resultDiv.innerHTML = 'Click "Run Advanced Pipeline" to see the complete ETL process with permalink sharing';
-            
-            if (pipelineDiv) {
-                pipelineDiv.innerHTML = '';
-            }
-            
-            // Remove any existing share button
-            const shareButton = document.getElementById('share-button');
-            if (shareButton) {
-                shareButton.remove();
-            }
-        };
-
-        // Override the runAdvancedPipeline function to show status
-        const originalRunAdvancedPipeline = window.runAdvancedPipeline;
-        window.runAdvancedPipeline = async function() {
-            const resultDiv = document.getElementById('advanced-result');
+        
+        window.runTest2 = function() {
+            const resultDiv = document.getElementById('test2-result');
             resultDiv.className = 'result-area loading';
-            resultDiv.innerHTML = '<span style="color: #2b6cb0;">🔄 Running advanced pipeline...</span>';
+            resultDiv.innerHTML = '🔄 Executing Test 2...';
             
             try {
-                await originalRunAdvancedPipeline();
+                // Simulate ETL pipeline execution
+                const mockData = [
+                    { name: 'Leanne Graham', email: 'Sincere@april.biz', city: 'Gwenborough' },
+                    { name: 'Ervin Howell', email: 'Shanna@melissa.tv', city: 'Wisokyburgh' },
+                    { name: 'Clementine Bauch', email: 'Nathan@yesenia.net', city: 'McKenziehaven' }
+                ];
                 
+                const tableBody = document.getElementById('test-table-body');
+                tableBody.innerHTML = '';
+                
+                mockData.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="padding: 15px; text-align: left; border-bottom: 1px solid #eee;">${user.name}</td>
+                        <td style="padding: 15px; text-align: left; border-bottom: 1px solid #eee;">${user.email}</td>
+                        <td style="padding: 15px; text-align: left; border-bottom: 1px solid #eee;">${user.city}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                document.getElementById('test-table').style.display = 'block';
                 resultDiv.className = 'result-area success';
-                resultDiv.innerHTML = '<span style="color: #2d7d32;">✅ Advanced pipeline completed successfully! Check the results below and use the share button to create a permalink.</span>';
+                resultDiv.innerHTML = '✅ Test 2 executed successfully! Table populated with data.';
             } catch (error) {
                 resultDiv.className = 'result-area error';
-                resultDiv.innerHTML = `<span style="color: #c53030;">❌ Pipeline failed: ${error.message}</span>`;
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        };
+        
+        window.runTest3 = function() {
+            const resultDiv = document.getElementById('test3-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '🔄 Executing Test 3...';
+            
+            try {
+                const editedCode = getEditedCode('test3');
+                if (editedCode) {
+                    // Execute the edited code
+                    eval(editedCode);
+                    resultDiv.className = 'result-area success';
+                    resultDiv.innerHTML = '✅ Test 3 executed successfully! Check console for output.';
+                } else {
+                    // Execute original code
+                    function calculateSum(a, b) {
+                        return a + b;
+                    }
+                    
+                    function calculateProduct(a, b) {
+                        return a * b;
+                    }
+                    
+                    const result1 = calculateSum(5, 3);
+                    const result2 = calculateProduct(4, 7);
+                    
+                    console.log('Sum:', result1);
+                    console.log('Product:', result2);
+                    
+                    resultDiv.className = 'result-area success';
+                    resultDiv.innerHTML = '✅ Test 3 executed successfully! Check console for output.';
+                }
+            } catch (error) {
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
             }
         };
     </script>
