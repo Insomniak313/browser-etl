@@ -1,6 +1,6 @@
 # 📦 Browser ETL
 
-Une librairie JavaScript légère et extensible pour exécuter des pipelines **Extract → Transform → Load** directement dans le navigateur, sans backend.
+A lightweight and extensible JavaScript library for executing **Extract → Transform → Load** pipelines directly in the browser, without a backend.
 
 ## 🚀 Installation
 
@@ -8,68 +8,64 @@ Une librairie JavaScript légère et extensible pour exécuter des pipelines **E
 npm install browser-etl
 ```
 
-## 📖 Utilisation rapide
+## 📖 Quick Usage
 
 ```javascript
 import { etl } from 'browser-etl';
 
-// Exemple simple : récupérer des données d'API et les afficher dans un tableau
+// Simple example: fetch data from API and display in a table
 etl()
-  .extract.api('https://api.example.com/users')
-  .filter(user => user.age > 18)
+  .extract.api('https://jsonplaceholder.typicode.com/users')
+  .filter(user => user.id <= 5)
   .load.table('#users-table')
   .run();
 ```
 
-## 🎯 Fonctionnalités principales
+## 🎯 Main Features
 
-### 🔍 Extracteurs (Sources de données)
-- **API REST** : Récupération de données depuis des APIs
-- **HTML** : Extraction de données depuis le DOM
-- **CSV** : Parsing de fichiers CSV
-- **localStorage** : Accès aux données stockées localement
-- **IndexedDB** : Accès aux bases de données IndexedDB
-- **Fichiers** : Upload et traitement de fichiers
+### 🔍 Extractors (Data Sources)
+- **REST API** : Data retrieval from APIs
+- **HTML** : Data extraction from DOM
+- **CSV** : CSV file parsing
+- **localStorage** : Access to locally stored data
+- **IndexedDB** : Access to IndexedDB databases
+- **Files** : Upload and file processing
 
-### 🔄 Transformateurs
-- **Filtrage** : Filtrer les données selon des critères
-- **Mapping** : Transformer les données
-- **Joins** : Joindre des datasets (nested/parallel)
-- **Enrichissement** : Enrichir avec des APIs tierces
+### 🔄 Transformers
+- **Filtering** : Filter data according to criteria
+- **Mapping** : Transform data
+- **Joins** : Join datasets (nested/parallel)
+- **Enrichment** : Enrich with third-party APIs
 
 ### 📊 Loaders (Destinations)
-- **Graphiques** : Génération de graphiques avec Chart.js
-- **Tableaux** : Affichage dans des tableaux HTML
-- **Fichiers** : Téléchargement de fichiers
-- **APIs** : Envoi vers des APIs externes
+- **Charts** : Chart generation with Chart.js
+- **Tables** : Display in HTML tables
+- **Files** : File downloads
+- **APIs** : Send to external APIs
 
-## 💡 Exemples d'utilisation
+## 💡 Usage Examples
 
-### Exemple complet : Dashboard météo
+### Complete Example: Weather Dashboard
 
 ```javascript
 import { etl } from 'browser-etl';
 
 etl()
-  .extract.api('https://api.example.com/users')
-  .join.api('https://api.weather.com', {
-    key: 'city',
+  .extract.api('https://jsonplaceholder.typicode.com/users')
+  .join.api('https://restcountries.com/v3.1/all', {
+    key: 'id',
     mode: 'nested'
   })
-  .join.api('https://api.images.com', {
-    key: 'weather',
-    mode: 'nested'
-  })
-  .transform(data => data.filter(u => u.age > 18))
+  .filter(user => user.id <= 5)
   .load.chart('bar', { 
-    x: 'city', 
-    y: 'temperature',
-    title: 'Température par ville'
+    x: 'name', 
+    y: 'id',
+    title: 'Users by ID'
   })
   .run();
 ```
 
-### Extraction depuis HTML
+### HTML Extraction
 
 ```javascript
 etl()
@@ -83,10 +79,10 @@ etl()
   .run();
 ```
 
-### Traitement de fichiers CSV
+### CSV File Processing
 
 ```javascript
-// Avec un fichier uploadé
+// With an uploaded file
 const fileInput = document.getElementById('csv-file');
 const file = fileInput.files[0];
 
@@ -100,27 +96,24 @@ etl()
   .run();
 ```
 
-### Enrichissement avec IA
+### AI Enrichment
 
 ```javascript
 etl()
-  .extract.api('https://api.example.com/products')
-  .enrich(async (product) => {
-    const aiResponse = await fetch('/api/ai/analyze', {
-      method: 'POST',
-      body: JSON.stringify({ text: product.description })
-    });
-    const analysis = await aiResponse.json();
-    return { ...product, sentiment: analysis.sentiment };
+  .extract.api('https://jsonplaceholder.typicode.com/posts')
+  .enrich(async (post) => {
+    const response = await fetch(`https://jsonplaceholder.typicode.com/comments?postId=${post.id}`);
+    const comments = await response.json();
+    return { ...post, commentCount: comments.length };
   })
   .load.chart('pie', {
-    x: 'sentiment',
-    y: 'count'
+    x: 'userId',
+    y: 'commentCount'
   })
   .run();
 ```
 
-## ⚙️ Configuration avancée
+## ⚙️ Advanced Configuration
 
 ```javascript
 import { etl } from 'browser-etl';
@@ -137,7 +130,7 @@ const pipeline = etl({
 });
 ```
 
-## 🔌 Système de plugins
+## 🔌 Plugin System
 
 ```javascript
 import { PluginManager } from 'browser-etl';
@@ -146,7 +139,7 @@ class CustomExtractor {
   name = 'custom';
   
   async extract(config) {
-    // Implémentation personnalisée
+    // Custom implementation
   }
   
   supports(config) {
@@ -168,7 +161,7 @@ const pluginManager = new PluginManager();
 await pluginManager.registerPlugin(plugin);
 ```
 
-## 🧪 Tests
+## 🧪 Testing
 
 ```bash
 npm test
@@ -202,29 +195,29 @@ const pipeline = etl(config)
 
 ## 🏗️ Architecture
 
-La librairie suit les principes **SOLID** :
+The library follows **SOLID** principles:
 
-- **Single Responsibility** : Chaque module a une responsabilité unique
-- **Open/Closed** : Extensible via plugins sans modification du cœur
-- **Liskov Substitution** : Tous les extracteurs/loaders respectent la même interface
-- **Interface Segregation** : Interfaces minimales pour éviter les dépendances inutiles
-- **Dependency Inversion** : Dépendance d'abstractions, pas d'implémentations
+- **Single Responsibility** : Each module has a single responsibility
+- **Open/Closed** : Extensible via plugins without modifying the core
+- **Liskov Substitution** : All extractors/loaders respect the same interface
+- **Interface Segregation** : Minimal interfaces to avoid unnecessary dependencies
+- **Dependency Inversion** : Depend on abstractions, not implementations
 
 ## 🚀 Performance
 
-- **Streams** : Support des streams pour les gros datasets
-- **Cache** : Cache local pour limiter les appels réseau
-- **Parallélisme** : Traitement parallèle contrôlé
-- **Batching** : Traitement par lots pour optimiser les performances
+- **Streams** : Stream support for large datasets
+- **Cache** : Local cache to limit network calls
+- **Parallelism** : Controlled parallel processing
+- **Batching** : Batch processing to optimize performance
 
-## 📄 Licence
+## 📄 License
 
 MIT
 
-## 🤝 Contribution
+## 🤝 Contributing
 
-Les contributions sont les bienvenues ! Veuillez lire notre guide de contribution et soumettre des pull requests.
+Contributions are welcome! Please read our contribution guide and submit pull requests.
 
 ## 📞 Support
 
-Pour toute question ou problème, veuillez ouvrir une issue sur GitHub.
+For any questions or issues, please open an issue on GitHub.
