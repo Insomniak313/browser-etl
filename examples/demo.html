@@ -338,17 +338,17 @@ etl()
                 
                 <div class="code-block">
 etl()
-  .extract.api('https://restcountries.com/v3.1/all')
-  .filter(country => country.population > 100000000)
-  .map(country => ({
-    name: country.name.common,
-    population: country.population,
-    region: country.region
+  .extract.api('https://jsonplaceholder.typicode.com/posts')
+  .filter(post => post.id <= 10)
+  .map(post => ({
+    title: post.title.substring(0, 20) + '...',
+    userId: post.userId,
+    id: post.id
   }))
   .load.chart('bar', {
-    x: 'name',
-    y: 'population',
-    title: 'Population by Country (100M+)'
+    x: 'title',
+    y: 'userId',
+    title: 'Posts by User ID (Top 10)'
   })
   .run();
                 </div>
@@ -940,17 +940,17 @@ etl()
             try {
                 const etl = new MockETL();
                 await etl
-                    .extract.api('https://restcountries.com/v3.1/all')
-                    .filter(country => country.population > 100000000)
-                    .map(country => ({
-                        name: country.name.common,
-                        population: country.population,
-                        region: country.region
+                    .extract.api('https://jsonplaceholder.typicode.com/posts')
+                    .filter(post => post.id <= 10)
+                    .map(post => ({
+                        title: post.title.substring(0, 20) + '...',
+                        userId: post.userId,
+                        id: post.id
                     }))
                     .load.chart('bar', {
-                        x: 'name',
-                        y: 'population',
-                        title: 'Population by Country (100M+)'
+                        x: 'title',
+                        y: 'userId',
+                        title: 'Posts by User ID (Top 10)'
                     })
                     .run();
 
