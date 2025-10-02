@@ -61,6 +61,93 @@
             color: green;
             margin-top: 10px;
         }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .code-block.editable {
+            border-color: #667eea;
+            cursor: text;
+        }
+        
+        .code-block.editable:hover {
+            border-color: #4facfe;
+        }
+        
+        .code-block.editing {
+            border-color: #43e97b;
+            background: #1a202c;
+        }
+        
+        .code-edit-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            gap: 5px;
+        }
+        
+        .code-block.editable .code-edit-controls {
+            display: flex;
+        }
+        
+        .code-edit-btn {
+            background: rgba(102, 126, 234, 0.8);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+        
+        .code-edit-btn:hover {
+            background: rgba(102, 126, 234, 1);
+        }
+        
+        .code-edit-btn.save {
+            background: rgba(67, 233, 123, 0.8);
+        }
+        
+        .code-edit-btn.save:hover {
+            background: rgba(67, 233, 123, 1);
+        }
+        
+        .code-edit-btn.cancel {
+            background: rgba(250, 112, 154, 0.8);
+        }
+        
+        .code-edit-btn.cancel:hover {
+            background: rgba(250, 112, 154, 1);
+        }
+        
+        .code-textarea {
+            background: transparent;
+            color: inherit;
+            border: none;
+            outline: none;
+            width: 100%;
+            min-height: 100px;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            resize: vertical;
+            padding: 0;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -68,6 +155,18 @@
     
     <div class="container">
         <h2>1. API Extraction and Table Display</h2>
+        <div class="code-block editable" data-demo="loadUsersTable">
+            <div class="code-edit-controls">
+                <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
+            </div>
+            <div class="code-content">
+etl()
+  .extract.api('https://jsonplaceholder.typicode.com/users')
+  .filter(user => user.id <= 5)
+  .load.table('#users-table')
+  .run();
+            </div>
+        </div>
         <button onclick="loadUsersTable()">Load Users</button>
         <button onclick="shareDemo('basic-usage')" style="background: #ffc107; color: #000;">🔗 Share</button>
         <div id="table-result"></div>
@@ -76,6 +175,17 @@
 
     <div class="container">
         <h2>2. API Extraction and Chart</h2>
+        <div class="code-block editable" data-demo="loadUsersChart">
+            <div class="code-edit-controls">
+                <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
+            </div>
+            <div class="code-content">
+etl()
+  .extract.api('https://jsonplaceholder.typicode.com/users')
+  .load.chart('bar', { x: 'name', y: 'id', title: 'Users by ID' })
+  .run();
+            </div>
+        </div>
         <button onclick="loadUsersChart()">Generate Chart</button>
         <button onclick="shareDemo('basic-usage')" style="background: #ffc107; color: #000;">🔗 Share</button>
         <div id="chart-result"></div>
@@ -86,6 +196,26 @@
 
     <div class="container">
         <h2>3. CSV Data Processing</h2>
+        <div class="code-block editable" data-demo="processCSV">
+            <div class="code-edit-controls">
+                <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
+            </div>
+            <div class="code-content">
+// CSV processing example
+const file = document.getElementById('csv-file').files[0];
+const text = await file.text();
+const lines = text.split('\n');
+const headers = lines[0].split(',');
+const data = lines.slice(1).map(line => {
+  const values = line.split(',');
+  const obj = {};
+  headers.forEach((header, index) => {
+    obj[header.trim()] = values[index]?.trim();
+  });
+  return obj;
+});
+            </div>
+        </div>
         <input type="file" id="csv-file" accept=".csv" />
         <button onclick="processCSV()">Process CSV</button>
         <button onclick="shareDemo('basic-usage')" style="background: #ffc107; color: #000;">🔗 Share</button>
@@ -95,6 +225,19 @@
 
     <div class="container">
         <h2>4. Complete Pipeline with Joins</h2>
+        <div class="code-block editable" data-demo="runCompletePipeline">
+            <div class="code-edit-controls">
+                <button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>
+            </div>
+            <div class="code-content">
+etl()
+  .extract.api('https://jsonplaceholder.typicode.com/posts')
+  .filter(post => post.id <= 10)
+  .map(post => ({ ...post, category: post.id > 5 ? 'Recent' : 'Older' }))
+  .load.chart('pie', { x: 'category', y: 'count', title: 'Posts by Category' })
+  .run();
+            </div>
+        </div>
         <button onclick="runCompletePipeline()">Run Complete Pipeline</button>
         <button onclick="shareDemo('basic-usage')" style="background: #ffc107; color: #000;">🔗 Share</button>
         <div id="pipeline-result"></div>
@@ -341,6 +484,122 @@
                 console.error('Failed to copy to clipboard:', error);
                 return false;
             }
+        }
+
+        // Global variables for code editing
+        let editedCodeBlocks = {}; // Store edited code for each demo
+        
+        // Code editing functions
+        window.editCode = function(button) {
+            const codeBlock = button.closest('.code-block');
+            const codeContent = codeBlock.querySelector('.code-content');
+            const demoId = codeBlock.getAttribute('data-demo');
+            
+            // Store original content if not already stored
+            if (!editedCodeBlocks[demoId]) {
+                editedCodeBlocks[demoId] = {
+                    original: codeContent.textContent.trim(),
+                    current: codeContent.textContent.trim()
+                };
+            }
+            
+            // Create textarea for editing
+            const textarea = document.createElement('textarea');
+            textarea.className = 'code-textarea';
+            textarea.value = editedCodeBlocks[demoId].current;
+            
+            // Replace content with textarea
+            codeContent.style.display = 'none';
+            codeBlock.appendChild(textarea);
+            
+            // Update controls
+            button.style.display = 'none';
+            const controls = codeBlock.querySelector('.code-edit-controls');
+            controls.innerHTML = `
+                <button class="code-edit-btn save" onclick="saveCode(this)">💾 Save</button>
+                <button class="code-edit-btn cancel" onclick="cancelEdit(this)">❌ Cancel</button>
+            `;
+            
+            // Add editing class
+            codeBlock.classList.add('editing');
+            
+            // Focus and select all text
+            textarea.focus();
+            textarea.select();
+        };
+        
+        window.saveCode = function(button) {
+            const codeBlock = button.closest('.code-block');
+            const textarea = codeBlock.querySelector('.code-textarea');
+            const codeContent = codeBlock.querySelector('.code-content');
+            const demoId = codeBlock.getAttribute('data-demo');
+            
+            // Save the edited code
+            editedCodeBlocks[demoId].current = textarea.value.trim();
+            
+            // Update the displayed content
+            codeContent.textContent = editedCodeBlocks[demoId].current;
+            
+            // Remove textarea and show content
+            textarea.remove();
+            codeContent.style.display = 'block';
+            
+            // Reset controls
+            const controls = codeBlock.querySelector('.code-edit-controls');
+            controls.innerHTML = `<button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>`;
+            
+            // Remove editing class
+            codeBlock.classList.remove('editing');
+            
+            // Show success message
+            showCodeEditSuccess(demoId);
+        };
+        
+        window.cancelEdit = function(button) {
+            const codeBlock = button.closest('.code-block');
+            const textarea = codeBlock.querySelector('.code-textarea');
+            const codeContent = codeBlock.querySelector('.code-content');
+            
+            // Remove textarea and show original content
+            textarea.remove();
+            codeContent.style.display = 'block';
+            
+            // Reset controls
+            const controls = codeBlock.querySelector('.code-edit-controls');
+            controls.innerHTML = `<button class="code-edit-btn" onclick="editCode(this)">✏️ Edit</button>`;
+            
+            // Remove editing class
+            codeBlock.classList.remove('editing');
+        };
+        
+        function showCodeEditSuccess(demoId) {
+            // Create a temporary success message
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #43e97b;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+                z-index: 1000;
+                font-weight: bold;
+                box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+            `;
+            successMsg.textContent = `✅ Code updated for ${demoId}!`;
+            
+            document.body.appendChild(successMsg);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+        }
+        
+        // Function to get edited code for a demo
+        function getEditedCode(demoId) {
+            return editedCodeBlocks[demoId] ? editedCodeBlocks[demoId].current : null;
         }
 
         // Share demo function
