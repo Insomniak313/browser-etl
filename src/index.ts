@@ -15,7 +15,9 @@ export type {
   JoinConfig,
   CacheEntry,
   StreamConfig,
-  ErrorRecoveryConfig
+  ErrorRecoveryConfig,
+  PermalinkOptions,
+  PermalinkResult
 } from './types';
 
 // Extractor exports
@@ -45,6 +47,13 @@ export { PluginManager } from './plugins/plugin-manager';
 export { Cache } from './utils/cache';
 export { StreamProcessor } from './utils/stream';
 export { ErrorRecovery } from './utils/error-recovery';
+export { 
+  generatePermalink, 
+  createHtmlPermalink, 
+  createDemoPermalink, 
+  copyPermalinkToClipboard, 
+  createShareButton 
+} from './utils/permalink';
 
 // Default export
 export default etl;

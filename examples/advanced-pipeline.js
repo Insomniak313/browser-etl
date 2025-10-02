@@ -1,464 +1,463 @@
 /**
- * Exemple avancé d'utilisation de Browser ETL
- * Ce fichier montre des cas d'usage complexes avec la librairie
+ * Advanced Pipeline Example with Permalink Sharing
+ * This example demonstrates how to use the Browser ETL library
+ * with permalink functionality for sharing results
  */
 
-import { etl, PluginManager } from 'browser-etl';
+// Import the permalink utilities (in a real implementation, this would be from the compiled library)
+// import { generatePermalink, createShareButton, copyPermalinkToClipboard } from '../src/utils/permalink.js';
 
-// ============================================================================
-// EXEMPLE 1: Dashboard météo avec enrichissement
-// ============================================================================
+class AdvancedETLPipeline {
+    constructor() {
+        this.data = [];
+        this.results = [];
+        this.shareButtons = new Map();
+    }
 
-async function weatherDashboard() {
-  console.log('🌤️ Création du dashboard météo...');
-  
-  try {
-    const result = await etl({
-      enableCache: true,
-      cacheDuration: 300000, // 5 minutes
-      enableParallel: true,
-      maxParallel: 5
-    })
-      .extract.api('https://api.example.com/cities')
-      .join.api('https://api.weather.com/current', {
-        key: 'city',
-        mode: 'nested',
-        type: 'inner'
-      })
-      .join.api('https://api.weather.com/forecast', {
-        key: 'city',
-        mode: 'nested',
-        type: 'left'
-      })
-      .enrich(async (city) => {
-        // Enrichissement avec données démographiques
-        const response = await fetch(`https://api.demographics.com/city/${city.id}`);
-        const demographics = await response.json();
-        return { ...city, population: demographics.population };
-      })
-      .transform(data => data.filter(city => city.population > 100000))
-      .map(city => ({
-        ...city,
-        weatherScore: calculateWeatherScore(city.current, city.forecast),
-        riskLevel: assessWeatherRisk(city.current, city.forecast)
-      }))
-      .load.chart('bar', {
-        x: 'city',
-        y: 'weatherScore',
-        title: 'Score météo par ville',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)'
-      })
-      .run();
+    /**
+     * Run a complete ETL pipeline with data processing
+     */
+    async runCompletePipeline() {
+        try {
+            console.log('🚀 Starting advanced ETL pipeline...');
+            
+            // Step 1: Extract data from multiple sources
+            const usersData = await this.extractUsers();
+            const postsData = await this.extractPosts();
+            
+            // Step 2: Transform and join data
+            const enrichedData = await this.enrichData(usersData, postsData);
+            
+            // Step 3: Filter and aggregate
+            const filteredData = this.filterAndAggregate(enrichedData);
+            
+            // Step 4: Load results
+            await this.loadResults(filteredData);
+            
+            // Step 5: Generate shareable permalink
+            await this.generateShareableLink();
+            
+            console.log('✅ Pipeline completed successfully!');
+            return filteredData;
+            
+        } catch (error) {
+            console.error('❌ Pipeline failed:', error);
+            throw error;
+        }
+    }
 
-    console.log('✅ Dashboard météo créé avec succès');
-    return result;
-  } catch (error) {
-    console.error('❌ Erreur lors de la création du dashboard:', error);
-    throw error;
-  }
-}
+    /**
+     * Extract users data from API
+     */
+    async extractUsers() {
+        console.log('📥 Extracting users data...');
+        const response = await fetch('https://jsonplaceholder.typicode.com/users');
+        const users = await response.json();
+        console.log(`✅ Extracted ${users.length} users`);
+        return users;
+    }
 
-// ============================================================================
-// EXEMPLE 2: Analyse de sentiment avec IA
-// ============================================================================
+    /**
+     * Extract posts data from API
+     */
+    async extractPosts() {
+        console.log('📥 Extracting posts data...');
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+        const posts = await response.json();
+        console.log(`✅ Extracted ${posts.length} posts`);
+        return posts;
+    }
 
-async function sentimentAnalysis() {
-  console.log('🤖 Analyse de sentiment en cours...');
-  
-  try {
-    const result = await etl({
-      enableStreaming: true,
-      batchSize: 50,
-      enableErrorRecovery: true,
-      maxRetries: 3
-    })
-      .extract.api('https://api.example.com/reviews')
-      .filter(review => review.text && review.text.length > 10)
-      .enrich(async (review) => {
-        // Appel à une API d'IA pour l'analyse de sentiment
-        const aiResponse = await fetch('/api/ai/sentiment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: review.text })
+    /**
+     * Enrich posts with user information
+     */
+    async enrichData(users, posts) {
+        console.log('🔄 Enriching data...');
+        
+        const enrichedPosts = posts.map(post => {
+            const user = users.find(u => u.id === post.userId);
+            return {
+                ...post,
+                user: user ? {
+                    name: user.name,
+                    email: user.email,
+                    company: user.company.name
+                } : null
+            };
         });
         
-        if (!aiResponse.ok) {
-          throw new Error(`Erreur API IA: ${aiResponse.status}`);
+        console.log(`✅ Enriched ${enrichedPosts.length} posts`);
+        return enrichedPosts;
+    }
+
+    /**
+     * Filter and aggregate data
+     */
+    filterAndAggregate(data) {
+        console.log('🔍 Filtering and aggregating data...');
+        
+        // Filter posts with user information
+        const validPosts = data.filter(post => post.user !== null);
+        
+        // Group by company
+        const groupedByCompany = validPosts.reduce((acc, post) => {
+            const company = post.user.company;
+            if (!acc[company]) {
+                acc[company] = [];
+            }
+            acc[company].push(post);
+            return acc;
+        }, {});
+        
+        // Create summary
+        const summary = Object.entries(groupedByCompany).map(([company, posts]) => ({
+            company,
+            postCount: posts.length,
+            avgTitleLength: posts.reduce((sum, post) => sum + post.title.length, 0) / posts.length,
+            users: [...new Set(posts.map(p => p.user.name))]
+        }));
+        
+        console.log(`✅ Created summary for ${summary.length} companies`);
+        return summary;
+    }
+
+    /**
+     * Load results to UI
+     */
+    async loadResults(data) {
+        console.log('📊 Loading results to UI...');
+        
+        // Create or update results container
+        let container = document.getElementById('pipeline-results');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'pipeline-results';
+            container.innerHTML = '<h3>📊 Pipeline Results</h3>';
+            document.body.appendChild(container);
         }
         
-        const analysis = await aiResponse.json();
-        return {
-          ...review,
-          sentiment: analysis.sentiment,
-          confidence: analysis.confidence,
-          keywords: analysis.keywords
-        };
-      })
-      .map(review => ({
-        ...review,
-        sentimentScore: mapSentimentToScore(review.sentiment),
-        category: categorizeReview(review.sentiment, review.confidence)
-      }))
-      .load.chart('pie', {
-        x: 'sentiment',
-        y: 'count',
-        title: 'Distribution des sentiments',
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',  // Négatif
-          'rgba(54, 162, 235, 0.2)',  // Neutre
-          'rgba(75, 192, 192, 0.2)'    // Positif
-        ]
-      })
-      .run();
-
-    console.log('✅ Analyse de sentiment terminée');
-    return result;
-  } catch (error) {
-    console.error('❌ Erreur lors de l\'analyse de sentiment:', error);
-    throw error;
-  }
-}
-
-// ============================================================================
-// EXEMPLE 3: Pipeline de données financières
-// ============================================================================
-
-async function financialDataPipeline() {
-  console.log('💰 Pipeline de données financières...');
-  
-  try {
-    const result = await etl({
-      enableCache: true,
-      cacheDuration: 60000, // 1 minute pour les données financières
-      enableParallel: true,
-      maxParallel: 3
-    })
-      .extract.api('https://api.finance.com/stocks')
-      .join.api('https://api.finance.com/prices', {
-        key: 'symbol',
-        mode: 'nested'
-      })
-      .join.api('https://api.finance.com/analysts', {
-        key: 'symbol',
-        mode: 'nested'
-      })
-      .transform(data => data.filter(stock => stock.price > 10))
-      .map(stock => ({
-        ...stock,
-        marketCap: stock.price * stock.shares,
-        peRatio: stock.price / stock.earnings,
-        recommendation: stock.analysts?.recommendation || 'HOLD',
-        riskLevel: calculateRiskLevel(stock)
-      }))
-      .filter(stock => stock.peRatio > 0 && stock.peRatio < 50)
-      .load.table('#stocks-table', {
-        sortable: true,
-        searchable: true,
-        pagination: true,
-        pageSize: 20
-      })
-      .run();
-
-    console.log('✅ Pipeline financier terminé');
-    return result;
-  } catch (error) {
-    console.error('❌ Erreur dans le pipeline financier:', error);
-    throw error;
-  }
-}
-
-// ============================================================================
-// EXEMPLE 4: Plugin personnalisé
-// ============================================================================
-
-class CustomDataExtractor {
-  name = 'custom-data';
-  
-  async extract(config) {
-    const { source, format } = config;
-    
-    switch (source) {
-      case 'local-file':
-        return await this.extractFromLocalFile(format);
-      case 'web-scraping':
-        return await this.extractFromWebScraping(format);
-      default:
-        throw new Error(`Source non supportée: ${source}`);
+        // Create table
+        const table = document.createElement('table');
+        table.style.cssText = `
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-family: Arial, sans-serif;
+        `;
+        
+        // Header
+        const headerRow = document.createElement('tr');
+        headerRow.style.backgroundColor = '#f2f2f2';
+        ['Company', 'Posts', 'Avg Title Length', 'Users'].forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            th.style.cssText = 'padding: 12px; border: 1px solid #ddd; text-align: left;';
+            headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+        
+        // Data rows
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            [item.company, item.postCount, item.avgTitleLength.toFixed(1), item.users.join(', ')].forEach(cell => {
+                const td = document.createElement('td');
+                td.textContent = cell;
+                td.style.cssText = 'padding: 12px; border: 1px solid #ddd;';
+                row.appendChild(td);
+            });
+            table.appendChild(row);
+        });
+        
+        container.appendChild(table);
+        
+        // Store data for sharing
+        this.data = data;
+        console.log('✅ Results loaded to UI');
     }
-  }
-  
-  async extractFromLocalFile(format) {
-    // Simulation d'extraction depuis un fichier local
-    return [
-      { id: 1, name: 'Donnée locale 1', value: 100 },
-      { id: 2, name: 'Donnée locale 2', value: 200 }
-    ];
-  }
-  
-  async extractFromWebScraping(format) {
-    // Simulation de web scraping
-    return [
-      { id: 1, name: 'Donnée web 1', value: 150 },
-      { id: 2, name: 'Donnée web 2', value: 250 }
-    ];
-  }
-  
-  supports(config) {
-    return config && config.source && ['local-file', 'web-scraping'].includes(config.source);
-  }
-}
 
-class CustomTransformer {
-  name = 'custom-transform';
-  
-  async transform(data, config) {
-    const { operation, params } = config;
-    
-    switch (operation) {
-      case 'normalize':
-        return this.normalizeData(data, params);
-      case 'aggregate':
-        return this.aggregateData(data, params);
-      default:
-        throw new Error(`Opération non supportée: ${operation}`);
-    }
-  }
-  
-  normalizeData(data, params) {
-    const { field, min, max } = params;
-    return data.map(item => ({
-      ...item,
-      [field]: (item[field] - min) / (max - min)
-    }));
-  }
-  
-  aggregateData(data, params) {
-    const { groupBy, aggregate } = params;
-    const groups = {};
-    
-    data.forEach(item => {
-      const key = item[groupBy];
-      if (!groups[key]) {
-        groups[key] = [];
-      }
-      groups[key].push(item);
-    });
-    
-    return Object.entries(groups).map(([key, items]) => ({
-      [groupBy]: key,
-      count: items.length,
-      ...this.calculateAggregates(items, aggregate)
-    }));
-  }
-  
-  calculateAggregates(items, aggregate) {
-    const result = {};
-    aggregate.forEach(field => {
-      const values = items.map(item => item[field]).filter(v => v != null);
-      result[`${field}_avg`] = values.reduce((a, b) => a + b, 0) / values.length;
-      result[`${field}_min`] = Math.min(...values);
-      result[`${field}_max`] = Math.max(...values);
-    });
-    return result;
-  }
-  
-  supports(config) {
-    return config && config.operation && ['normalize', 'aggregate'].includes(config.operation);
-  }
-}
-
-async function customPluginExample() {
-  console.log('🔌 Exemple de plugin personnalisé...');
-  
-  const plugin = {
-    name: 'custom-data-plugin',
-    version: '1.0.0',
-    
-    async initialize() {
-      console.log('Plugin personnalisé initialisé');
-    },
-    
-    async cleanup() {
-      console.log('Plugin personnalisé nettoyé');
-    },
-    
-    getExtractors() {
-      return [new CustomDataExtractor()];
-    },
-    
-    getTransformers() {
-      return [new CustomTransformer()];
-    },
-    
-    getLoaders() {
-      return [];
-    }
-  };
-  
-  const pluginManager = new PluginManager();
-  await pluginManager.registerPlugin(plugin);
-  
-  try {
-    const result = await etl()
-      .extract('custom-data', { source: 'local-file', format: 'json' })
-      .transform('custom-transform', {
-        operation: 'normalize',
-        params: { field: 'value', min: 0, max: 300 }
-      })
-      .load.table('#custom-table')
-      .run();
-
-    console.log('✅ Plugin personnalisé exécuté avec succès');
-    return result;
-  } catch (error) {
-    console.error('❌ Erreur avec le plugin personnalisé:', error);
-    throw error;
-  }
-}
-
-// ============================================================================
-// EXEMPLE 5: Pipeline avec gestion d'erreurs avancée
-// ============================================================================
-
-async function robustPipeline() {
-  console.log('🛡️ Pipeline robuste avec gestion d\'erreurs...');
-  
-  try {
-    const result = await etl({
-      enableErrorRecovery: true,
-      maxRetries: 5,
-      enableCache: true,
-      cacheDuration: 300000
-    })
-      .extract.api('https://api.example.com/data')
-      .transform(data => {
-        // Transformation qui peut échouer
-        if (!Array.isArray(data)) {
-          throw new Error('Données invalides: attendu un tableau');
+    /**
+     * Generate a shareable permalink using htmlpreview.github.com
+     */
+    async generateShareableLink() {
+        console.log('🔗 Generating shareable permalink...');
+        
+        try {
+            // Create a summary of the results
+            const summary = {
+                timestamp: new Date().toISOString(),
+                dataCount: this.data.length,
+                companies: this.data.map(item => item.company),
+                totalPosts: this.data.reduce((sum, item) => sum + item.postCount, 0)
+            };
+            
+            // Generate permalink using the utility function
+            const permalinkResult = await this.generatePermalink({
+                repository: 'https://github.com/Insomniak313/browser-etl',
+                branch: 'main',
+                filePath: 'examples/advanced-pipeline.js',
+                queryParams: {
+                    summary: JSON.stringify(summary),
+                    timestamp: summary.timestamp
+                }
+            });
+            
+            if (permalinkResult.success) {
+                // Create share button
+                this.createShareButton(permalinkResult.previewUrl);
+                console.log('✅ Shareable permalink generated:', permalinkResult.previewUrl);
+            } else {
+                console.error('❌ Failed to generate permalink:', permalinkResult.error);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error generating shareable link:', error);
         }
-        return data.map(item => ({
-          ...item,
-          processed: true,
-          timestamp: new Date().toISOString()
-        }));
-      })
-      .filter(item => item.processed)
-      .load.file('processed-data.json', 'json')
-      .run();
+    }
 
-    console.log('✅ Pipeline robuste terminé avec succès');
-    return result;
-  } catch (error) {
-    console.error('❌ Erreur dans le pipeline robuste:', error);
+    /**
+     * Generate permalink using htmlpreview.github.com
+     */
+    async generatePermalink(options) {
+        try {
+            const { repository, branch = 'main', filePath, queryParams = {} } = options;
+            
+            // Validate inputs
+            if (!repository || !filePath) {
+                return {
+                    url: '',
+                    previewUrl: '',
+                    success: false,
+                    error: 'Repository and filePath are required'
+                };
+            }
+
+            // Extract repository path from GitHub URL
+            const repoMatch = repository.match(/github\.com\/([^\/]+\/[^\/]+)/);
+            if (!repoMatch) {
+                return {
+                    url: '',
+                    previewUrl: '',
+                    success: false,
+                    error: 'Invalid GitHub repository URL'
+                };
+            }
+
+            const repoPath = repoMatch[1];
+            
+            // Construct the raw GitHub URL
+            const rawUrl = `https://raw.githubusercontent.com/${repoPath}/${branch}/${filePath}`;
+            
+            // Construct the htmlpreview URL
+            const previewUrl = `https://htmlpreview.github.io/?${rawUrl}`;
+            
+            // Add query parameters if provided
+            const queryString = Object.entries(queryParams)
+                .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+                .join('&');
+            
+            const finalPreviewUrl = queryString ? `${previewUrl}&${queryString}` : previewUrl;
+
+            return {
+                url: rawUrl,
+                previewUrl: finalPreviewUrl,
+                success: true
+            };
+        } catch (error) {
+            return {
+                url: '',
+                previewUrl: '',
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred'
+            };
+        }
+    }
+
+    /**
+     * Create a share button for the permalink
+     */
+    createShareButton(previewUrl) {
+        // Remove existing share button if any
+        const existingButton = document.getElementById('share-button');
+        if (existingButton) {
+            existingButton.remove();
+        }
+        
+        // Create new share button
+        const button = document.createElement('button');
+        button.id = 'share-button';
+        button.textContent = '🔗 Share Results';
+        button.style.cssText = `
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        `;
+        
+        button.addEventListener('click', async () => {
+            try {
+                button.disabled = true;
+                button.textContent = '📋 Copying...';
+                
+                const success = await this.copyToClipboard(previewUrl);
+                
+                if (success) {
+                    button.textContent = '✅ Copied!';
+                    setTimeout(() => {
+                        button.textContent = '🔗 Share Results';
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    // Fallback: show URL in prompt
+                    prompt('Share this link:', previewUrl);
+                    button.textContent = '🔗 Share Results';
+                    button.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error copying to clipboard:', error);
+                prompt('Share this link:', previewUrl);
+                button.textContent = '🔗 Share Results';
+                button.disabled = false;
+            }
+        });
+        
+        // Add hover effect
+        button.addEventListener('mouseenter', () => {
+            button.style.transform = 'translateY(-2px)';
+            button.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
+        });
+        
+        button.addEventListener('mouseleave', () => {
+            button.style.transform = 'translateY(0)';
+            button.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
+        });
+        
+        // Append to results container
+        const container = document.getElementById('pipeline-results');
+        if (container) {
+            container.appendChild(button);
+        } else {
+            document.body.appendChild(button);
+        }
+    }
+
+    /**
+     * Copy text to clipboard
+     */
+    async copyToClipboard(text) {
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                const success = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                return success;
+            }
+        } catch (error) {
+            console.error('Failed to copy to clipboard:', error);
+            return false;
+        }
+    }
+}
+
+// Example usage
+async function runAdvancedPipeline() {
+    const pipeline = new AdvancedETLPipeline();
     
-    // Fallback: utiliser des données de démonstration
-    console.log('🔄 Utilisation des données de démonstration...');
+    try {
+        const results = await pipeline.runCompletePipeline();
+        console.log('Pipeline results:', results);
+        
+        // Show success message
+        const message = document.createElement('div');
+        message.innerHTML = `
+            <div style="
+                background: #d4edda;
+                color: #155724;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+                border: 1px solid #c3e6cb;
+            ">
+                <strong>✅ Advanced Pipeline Completed!</strong><br>
+                Processed data from ${results.length} companies with ${results.reduce((sum, item) => sum + item.postCount, 0)} total posts.
+                Use the share button to create a permalink for these results.
+            </div>
+        `;
+        document.body.appendChild(message);
+        
+    } catch (error) {
+        console.error('Pipeline failed:', error);
+        
+        // Show error message
+        const message = document.createElement('div');
+        message.innerHTML = `
+            <div style="
+                background: #f8d7da;
+                color: #721c24;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+                border: 1px solid #f5c6cb;
+            ">
+                <strong>❌ Pipeline Failed:</strong><br>
+                ${error.message}
+            </div>
+        `;
+        document.body.appendChild(message);
+    }
+}
+
+// Auto-run if this script is loaded directly
+if (typeof window !== 'undefined') {
+    // Add a button to run the pipeline
+    const runButton = document.createElement('button');
+    runButton.textContent = '🚀 Run Advanced Pipeline';
+    runButton.style.cssText = `
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 20px;
+        box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+        transition: all 0.3s ease;
+    `;
     
-    const fallbackResult = await etl()
-      .extract.localStorage('demo-data')
-      .load.table('#fallback-table')
-      .run();
-    
-    return fallbackResult;
-  }
-}
-
-// ============================================================================
-// Fonctions utilitaires
-// ============================================================================
-
-function calculateWeatherScore(current, forecast) {
-  const currentScore = (current.temperature - 20) / 30; // Score basé sur la température
-  const forecastScore = forecast.reduce((sum, day) => sum + day.score, 0) / forecast.length;
-  return Math.round((currentScore + forecastScore) * 50 + 50); // Score de 0 à 100
-}
-
-function assessWeatherRisk(current, forecast) {
-  const riskFactors = [
-    current.temperature > 35 || current.temperature < -10,
-    current.windSpeed > 50,
-    forecast.some(day => day.precipitation > 20)
-  ];
-  
-  const riskCount = riskFactors.filter(Boolean).length;
-  return ['Low', 'Medium', 'High'][riskCount] || 'Low';
-}
-
-function mapSentimentToScore(sentiment) {
-  const scores = { 'positive': 1, 'neutral': 0, 'negative': -1 };
-  return scores[sentiment] || 0;
-}
-
-function categorizeReview(sentiment, confidence) {
-  if (confidence > 0.8) {
-    return `Strong ${sentiment}`;
-  } else if (confidence > 0.6) {
-    return `Moderate ${sentiment}`;
-  } else {
-    return `Weak ${sentiment}`;
-  }
-}
-
-function calculateRiskLevel(stock) {
-  const volatility = stock.price * 0.1; // Simulation de volatilité
-  if (volatility > 50) return 'High';
-  if (volatility > 20) return 'Medium';
-  return 'Low';
-}
-
-// ============================================================================
-// Exécution des exemples
-// ============================================================================
-
-async function runAllExamples() {
-  console.log('🚀 Démarrage de tous les exemples...');
-  
-  try {
-    // Exécuter tous les exemples en parallèle
-    const results = await Promise.allSettled([
-      weatherDashboard(),
-      sentimentAnalysis(),
-      financialDataPipeline(),
-      customPluginExample(),
-      robustPipeline()
-    ]);
-    
-    results.forEach((result, index) => {
-      if (result.status === 'fulfilled') {
-        console.log(`✅ Exemple ${index + 1} terminé avec succès`);
-      } else {
-        console.error(`❌ Exemple ${index + 1} a échoué:`, result.reason);
-      }
+    runButton.addEventListener('click', runAdvancedPipeline);
+    runButton.addEventListener('mouseenter', () => {
+        runButton.style.transform = 'translateY(-2px)';
+        runButton.style.boxShadow = '0 6px 20px rgba(67, 233, 123, 0.4)';
+    });
+    runButton.addEventListener('mouseleave', () => {
+        runButton.style.transform = 'translateY(0)';
+        runButton.style.boxShadow = '0 4px 15px rgba(67, 233, 123, 0.3)';
     });
     
-    console.log('🎉 Tous les exemples ont été traités');
-  } catch (error) {
-    console.error('❌ Erreur globale:', error);
-  }
+    document.body.appendChild(runButton);
 }
 
-// Exporter les fonctions pour utilisation dans d'autres modules
-export {
-  weatherDashboard,
-  sentimentAnalysis,
-  financialDataPipeline,
-  customPluginExample,
-  robustPipeline,
-  runAllExamples
-};
-
-// Exécuter automatiquement si ce fichier est exécuté directement
-if (typeof window !== 'undefined') {
-  // Dans un navigateur
-  window.runAllExamples = runAllExamples;
-} else if (typeof module !== 'undefined' && module.exports) {
-  // Dans Node.js
-  module.exports = {
-    weatherDashboard,
-    sentimentAnalysis,
-    financialDataPipeline,
-    customPluginExample,
-    robustPipeline,
-    runAllExamples
-  };
+// Export for module usage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { AdvancedETLPipeline, runAdvancedPipeline };
 }

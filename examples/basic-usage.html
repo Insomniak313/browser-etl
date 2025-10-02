@@ -69,6 +69,7 @@
     <div class="container">
         <h2>1. API Extraction and Table Display</h2>
         <button onclick="loadUsersTable()">Load Users</button>
+        <button onclick="shareDemo('basic-usage')" style="background: #ffc107; color: #000;">🔗 Share</button>
         <div id="table-result"></div>
         <table id="users-table" style="display: none;"></table>
     </div>
@@ -76,6 +77,7 @@
     <div class="container">
         <h2>2. API Extraction and Chart</h2>
         <button onclick="loadUsersChart()">Generate Chart</button>
+        <button onclick="shareDemo('basic-usage')" style="background: #ffc107; color: #000;">🔗 Share</button>
         <div id="chart-result"></div>
         <div class="chart-container">
             <canvas id="users-chart" style="display: none;"></canvas>
@@ -86,6 +88,7 @@
         <h2>3. CSV Data Processing</h2>
         <input type="file" id="csv-file" accept=".csv" />
         <button onclick="processCSV()">Process CSV</button>
+        <button onclick="shareDemo('basic-usage')" style="background: #ffc107; color: #000;">🔗 Share</button>
         <div id="csv-result"></div>
         <table id="csv-table" style="display: none;"></table>
     </div>
@@ -93,6 +96,7 @@
     <div class="container">
         <h2>4. Complete Pipeline with Joins</h2>
         <button onclick="runCompletePipeline()">Run Complete Pipeline</button>
+        <button onclick="shareDemo('basic-usage')" style="background: #ffc107; color: #000;">🔗 Share</button>
         <div id="pipeline-result"></div>
         <div class="chart-container">
             <canvas id="pipeline-chart" style="display: none;"></canvas>
@@ -286,6 +290,82 @@
                 canvas.style.display = 'block';
             }
         }
+
+        // Permalink utility functions
+        async function generatePermalink(repository, branch = 'main', filePath) {
+            try {
+                const repoMatch = repository.match(/github\.com\/([^\/]+\/[^\/]+)/);
+                if (!repoMatch) {
+                    throw new Error('Invalid GitHub repository URL');
+                }
+
+                const repoPath = repoMatch[1];
+                const rawUrl = `https://raw.githubusercontent.com/${repoPath}/${branch}/${filePath}`;
+                const previewUrl = `https://htmlpreview.github.io/?${rawUrl}`;
+                
+                return {
+                    url: rawUrl,
+                    previewUrl: previewUrl,
+                    success: true
+                };
+            } catch (error) {
+                return {
+                    url: '',
+                    previewUrl: '',
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    const success = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    return success;
+                }
+            } catch (error) {
+                console.error('Failed to copy to clipboard:', error);
+                return false;
+            }
+        }
+
+        // Share demo function
+        window.shareDemo = async function(demoName) {
+            const repository = 'https://github.com/Insomniak313/browser-etl';
+            const filePath = `examples/basic-usage.html`;
+            
+            try {
+                const result = await generatePermalink(repository, 'main', filePath);
+                
+                if (result.success) {
+                    const copied = await copyToClipboard(result.previewUrl);
+                    
+                    if (copied) {
+                        alert('🔗 Permalink copié dans le presse-papiers!\n\n' + result.previewUrl);
+                    } else {
+                        prompt('Partagez ce lien:', result.previewUrl);
+                    }
+                } else {
+                    alert(`Erreur lors de la génération du permalink: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Erreur: ${error.message}`);
+            }
+        };
 
         // Global functions for buttons
         window.loadUsersTable = async () => {

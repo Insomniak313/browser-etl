@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced ETL Pipeline with Permalink Sharing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .demo-section {
+            margin: 30px 0;
+            padding: 30px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            background: #fafafa;
+        }
+        
+        .demo-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+        
+        .feature-card h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .result-area {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 100px;
+            background: white;
+            border: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .result-area.success {
+            border-color: #43e97b;
+            background: #f0fff4;
+            color: #2d7d32;
+        }
+        
+        .result-area.error {
+            border-color: #fa709a;
+            background: #fff5f5;
+            color: #c53030;
+        }
+        
+        .result-area.loading {
+            border-color: #4facfe;
+            background: #f0f9ff;
+            color: #2b6cb0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .footer a {
+            color: #4facfe;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Advanced ETL Pipeline</h1>
+            <p>Complete data processing with permalink sharing using htmlpreview.github.com</p>
+        </div>
+        
+        <div class="content">
+            <!-- Features Section -->
+            <div class="demo-section">
+                <h2>🎯 Key Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>📊 Multi-Source Extraction</h4>
+                        <p>Extract data from multiple APIs simultaneously with error handling and retry logic</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔄 Data Enrichment</h4>
+                        <p>Join and enrich data from different sources with user information and company details</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📈 Advanced Analytics</h4>
+                        <p>Filter, aggregate, and analyze data with statistical calculations and grouping</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔗 Permalink Sharing</h4>
+                        <p>Generate shareable links using htmlpreview.github.com for easy collaboration</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pipeline Demo -->
+            <div class="demo-section">
+                <h2>🔄 Advanced Pipeline Demo</h2>
+                <p>This demo shows a complete ETL pipeline that extracts data from multiple sources, enriches it, and generates shareable permalinks.</p>
+                
+                <div class="code-block">
+// Advanced ETL Pipeline with Permalink Sharing
+const pipeline = new AdvancedETLPipeline();
+
+// Run complete pipeline
+const results = await pipeline.runCompletePipeline();
+
+// Pipeline includes:
+// 1. Extract users and posts from APIs
+// 2. Enrich posts with user information
+// 3. Filter and aggregate by company
+// 4. Generate shareable permalink
+// 5. Create interactive results table
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="runAdvancedPipeline()">🚀 Run Advanced Pipeline</button>
+                    <button class="btn btn-warning" onclick="shareAdvancedDemo()">🔗 Share Demo</button>
+                    <button class="btn" onclick="clearAdvancedResults()">🗑️ Clear Results</button>
+                </div>
+                
+                <div id="advanced-result" class="result-area">
+                    Click "Run Advanced Pipeline" to see the complete ETL process with permalink sharing
+                </div>
+                
+                <div id="pipeline-results"></div>
+            </div>
+            
+            <!-- Permalink Information -->
+            <div class="demo-section">
+                <h2>🔗 Permalink Sharing</h2>
+                <p>This demo uses the htmlpreview.github.com service to create shareable links for HTML content stored in GitHub repositories.</p>
+                
+                <div class="code-block">
+// Generate permalink using htmlpreview.github.com
+const permalinkResult = await generatePermalink({
+    repository: 'https://github.com/user/repo',
+    branch: 'main',
+    filePath: 'examples/demo.html',
+    queryParams: {
+        timestamp: new Date().toISOString(),
+        data: JSON.stringify(results)
+    }
+});
+
+// Result: https://htmlpreview.github.io/?https://raw.githubusercontent.com/user/repo/main/examples/demo.html
+                </div>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>🌐 Public Access</h4>
+                        <p>Anyone with the permalink can view the HTML content without needing GitHub access</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📱 Mobile Friendly</h4>
+                        <p>htmlpreview.github.com renders content responsively for all devices</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>⚡ Fast Loading</h4>
+                        <p>Content is served directly from GitHub's CDN for optimal performance</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔒 Secure</h4>
+                        <p>Uses GitHub's infrastructure for reliable and secure content delivery</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🚀 Advanced ETL Pipeline - Built with ❤️ for modern data processing</p>
+            <p><a href="https://github.com/Insomniak313/browser-etl">GitHub</a> | <a href="https://htmlpreview.github.io/">htmlpreview.github.com</a></p>
+        </div>
+    </div>
+
+    <script src="advanced-pipeline.js"></script>
+    <script>
+        // Permalink utility functions
+        async function generatePermalink(repository, branch = 'main', filePath) {
+            try {
+                const repoMatch = repository.match(/github\.com\/([^\/]+\/[^\/]+)/);
+                if (!repoMatch) {
+                    throw new Error('Invalid GitHub repository URL');
+                }
+
+                const repoPath = repoMatch[1];
+                const rawUrl = `https://raw.githubusercontent.com/${repoPath}/${branch}/${filePath}`;
+                const previewUrl = `https://htmlpreview.github.io/?${rawUrl}`;
+                
+                return {
+                    url: rawUrl,
+                    previewUrl: previewUrl,
+                    success: true
+                };
+            } catch (error) {
+                return {
+                    url: '',
+                    previewUrl: '',
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    const success = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    return success;
+                }
+            } catch (error) {
+                console.error('Failed to copy to clipboard:', error);
+                return false;
+            }
+        }
+
+        // Share advanced demo function
+        window.shareAdvancedDemo = async function() {
+            const repository = 'https://github.com/Insomniak313/browser-etl';
+            const filePath = `examples/advanced-pipeline.html`;
+            
+            try {
+                const result = await generatePermalink(repository, 'main', filePath);
+                
+                if (result.success) {
+                    const copied = await copyToClipboard(result.previewUrl);
+                    
+                    if (copied) {
+                        alert('🔗 Permalink copié dans le presse-papiers!\n\n' + result.previewUrl);
+                    } else {
+                        prompt('Partagez ce lien:', result.previewUrl);
+                    }
+                } else {
+                    alert(`Erreur lors de la génération du permalink: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Erreur: ${error.message}`);
+            }
+        };
+
+        // Clear advanced results function
+        window.clearAdvancedResults = function() {
+            const resultDiv = document.getElementById('advanced-result');
+            const pipelineDiv = document.getElementById('pipeline-results');
+            
+            resultDiv.className = 'result-area';
+            resultDiv.innerHTML = 'Click "Run Advanced Pipeline" to see the complete ETL process with permalink sharing';
+            
+            if (pipelineDiv) {
+                pipelineDiv.innerHTML = '';
+            }
+            
+            // Remove any existing share button
+            const shareButton = document.getElementById('share-button');
+            if (shareButton) {
+                shareButton.remove();
+            }
+        };
+
+        // Override the runAdvancedPipeline function to show status
+        const originalRunAdvancedPipeline = window.runAdvancedPipeline;
+        window.runAdvancedPipeline = async function() {
+            const resultDiv = document.getElementById('advanced-result');
+            resultDiv.className = 'result-area loading';
+            resultDiv.innerHTML = '<span style="color: #2b6cb0;">🔄 Running advanced pipeline...</span>';
+            
+            try {
+                await originalRunAdvancedPipeline();
+                
+                resultDiv.className = 'result-area success';
+                resultDiv.innerHTML = '<span style="color: #2d7d32;">✅ Advanced pipeline completed successfully! Check the results below and use the share button to create a permalink.</span>';
+            } catch (error) {
+                resultDiv.className = 'result-area error';
+                resultDiv.innerHTML = `<span style="color: #c53030;">❌ Pipeline failed: ${error.message}</span>`;
+            }
+        };
+    </script>
+</body>
+</html>
