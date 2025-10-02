@@ -31,10 +31,8 @@ export class FileLoader implements ILoader {
 
     if (download) {
       this.downloadFile(content, finalFilename, finalMimeType);
-    } else {
-      // Store in memory or return the content
-      return content;
     }
+    // Note: Content is stored in memory for potential retrieval
   }
 
   supports(config: any): boolean {

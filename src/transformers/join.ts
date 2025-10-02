@@ -1,10 +1,13 @@
-import { ITransformer, JoinConfig } from '../types';
+import { ITransformer } from '../types';
 
-export interface JoinTransformerConfig extends JoinConfig {
+export interface JoinTransformerConfig {
   type: 'api' | 'data';
   url?: string;
   data?: any;
   options?: RequestInit;
+  joinFn?: (left: any, right: any) => any;
+  key: string;
+  mode: 'nested' | 'parallel';
 }
 
 /**

@@ -34,13 +34,15 @@ export class IndexedDBExtractor implements IExtractor {
         const transaction = db.transaction([storeName], 'readonly');
         const store = transaction.objectStore(storeName);
         
-        let objectStore = store;
+        let cursorRequest: IDBRequest<IDBCursorWithValue | null>;
         if (index) {
-          objectStore = store.index(index);
+          const indexObj = store.index(index);
+          cursorRequest = indexObj.openCursor(query, direction);
+        } else {
+          cursorRequest = store.openCursor(query, direction);
         }
 
         const results: any[] = [];
-        const cursorRequest = objectStore.openCursor(query, direction);
 
         cursorRequest.onsuccess = (event) => {
           const cursor = (event.target as IDBRequest).result;

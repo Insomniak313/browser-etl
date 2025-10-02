@@ -131,7 +131,7 @@ export class TableLoader implements ILoader {
     return config && config.container;
   }
 
-  private prepareTableData(data: any, headers?: string[]): any[] {
+  private prepareTableData(data: any, _headers?: string[]): any[] {
     if (Array.isArray(data)) {
       return data;
     }
@@ -160,7 +160,7 @@ export class TableLoader implements ILoader {
     return ['Value'];
   }
 
-  private populateTableBody(tbody: HTMLElement, data: any[], className: string): void {
+  private populateTableBody(tbody: HTMLElement, data: any[], _className: string): void {
     data.forEach((item, index) => {
       const row = document.createElement('tr');
       row.style.cssText = `

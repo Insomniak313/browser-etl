@@ -52,9 +52,17 @@ export class HtmlExtractor implements IExtractor {
     }
 
     if (multiple) {
-      return Array.from(elements).map(element => this.extractElementData(element, { attribute, text, html }));
+      return Array.from(elements).map(element => this.extractElementData(element, { 
+        ...(attribute && { attribute }), 
+        text, 
+        html 
+      }));
     } else {
-      return this.extractElementData(elements[0], { attribute, text, html });
+      return this.extractElementData(elements[0], { 
+        ...(attribute && { attribute }), 
+        text, 
+        html 
+      });
     }
   }
 

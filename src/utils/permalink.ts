@@ -93,7 +93,7 @@ export async function generatePermalink(options: PermalinkOptions): Promise<Perm
  * @returns Promise with the permalink result
  */
 export async function createHtmlPermalink(
-  htmlContent: string,
+  _htmlContent: string,
   filename: string,
   options: Omit<PermalinkOptions, 'filePath'>
 ): Promise<PermalinkResult> {
