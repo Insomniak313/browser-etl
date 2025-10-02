@@ -192,6 +192,7 @@ export class ETLPipeline {
       const cacheKey = this.generateCacheKey(step);
       const cachedData = this.getCachedData(cacheKey);
       if (cachedData) {
+        cacheHits++;
         return cachedData;
       }
     }
@@ -202,6 +203,7 @@ export class ETLPipeline {
     if (this.config.enableCache) {
       const cacheKey = this.generateCacheKey(step);
       this.setCachedData(cacheKey, data);
+      cacheMisses++;
     }
 
     return data;

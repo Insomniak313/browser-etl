@@ -232,7 +232,7 @@ describe('ETLPipeline', () => {
 
       pipeline
         .extract('test-extractor', {})
-        .transform('optional-transformer', {}, true) // Mark as optional
+        .transform('optional-transformer', {})
         .load('test-loader', {});
 
       const result = await pipeline.run();

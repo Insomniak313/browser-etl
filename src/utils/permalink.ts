@@ -3,27 +3,7 @@
  * This allows sharing HTML content through GitHub's preview service
  */
 
-export interface PermalinkOptions {
-  /** The GitHub repository URL (e.g., 'https://github.com/user/repo') */
-  repository: string;
-  /** The branch name (default: 'main') */
-  branch?: string;
-  /** The file path in the repository */
-  filePath: string;
-  /** Additional query parameters for the preview */
-  queryParams?: Record<string, string>;
-}
-
-export interface PermalinkResult {
-  /** The generated permalink URL */
-  url: string;
-  /** The htmlpreview URL */
-  previewUrl: string;
-  /** Whether the permalink was generated successfully */
-  success: boolean;
-  /** Error message if generation failed */
-  error?: string;
-}
+import { PermalinkOptions, PermalinkResult } from '../types';
 
 /**
  * Generates a permalink using htmlpreview.github.com
